@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="摘要: 本文详细介绍了Linux Volume Manager (LVM) 的相关命令，包括磁盘分区、物理卷创建、卷组管理、逻辑卷创建与管理、文件系统挂载与自动挂载等步骤。LVM 是一种逻辑卷管理技术，允许用户在物理磁盘上创建、扩展、缩减和移动分区，而不必重新分区或重新格式化磁盘。">
+<title>LVM相关命令</title>
+
+<link rel='canonical' href='http://localhost:1313/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="LVM相关命令">
+<meta property='og:description' content="摘要: 本文详细介绍了Linux Volume Manager (LVM) 的相关命令，包括磁盘分区、物理卷创建、卷组管理、逻辑卷创建与管理、文件系统挂载与自动挂载等步骤。LVM 是一种逻辑卷管理技术，允许用户在物理磁盘上创建、扩展、缩减和移动分区，而不必重新分区或重新格式化磁盘。">
+<meta property='og:url' content='http://localhost:1313/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/'>
+<meta property='og:site_name' content='流年'>
+<meta property='og:type' content='article'><meta property='article:section' content='Ops' /><meta property='article:published_time' content='2024-05-11T08:38:47&#43;00:00'/><meta property='article:modified_time' content='2024-05-11T08:38:47&#43;00:00'/>
+<meta name="twitter:title" content="LVM相关命令">
+<meta name="twitter:description" content="摘要: 本文详细介绍了Linux Volume Manager (LVM) 的相关命令，包括磁盘分区、物理卷创建、卷组管理、逻辑卷创建与管理、文件系统挂载与自动挂载等步骤。LVM 是一种逻辑卷管理技术，允许用户在物理磁盘上创建、扩展、缩减和移动分区，而不必重新分区或重新格式化磁盘。">
+  
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/logo_hub36d4cf3c1d27a2d9b323f3396e3fa15_9925_300x0_resize_box_3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">流年</a></h1>
+            <h2 class="site-description">这个人很懒，暂时啥都没写</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/Williamyzd'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/ai/' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342212304" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4225" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M501.824 32C303.552 32 141.504 176.992 141.504 357.76c0 23.712 2.816 47.104 8.32 69.856l-51.008 114.208a32 32 0 0 0 24.704 44.736c54.272 7.744 76.672 31.168 76.672 77.312v111.552a64 64 0 0 0 64 64h20.704a64 64 0 0 1 64 64V960a32 32 0 0 0 32 32h345.6a32 32 0 0 0 0-64h-313.6v-24.608a128 128 0 0 0-128-128h-20.736v-111.552c0-65.664-32.192-110.688-91.2-131.136l39.872-89.28a31.968 31.968 0 0 0 1.568-21.792 233.088 233.088 0 0 1-8.896-63.904c0-143.712 131.936-261.76 296.32-261.76s296.32 118.016 296.32 261.76a32 32 0 0 0 64 0C862.144 176.992 700.064 32 501.824 32zM904 448a32 32 0 0 0-32 32v360a32 32 0 0 0 64 0V480a32 32 0 0 0-32-32z" p-id="4226"></path><path d="M673.888 466.656c-11.744-25.568-48.416-24.64-58.816 1.536l-132.8 333.76a32 32 0 0 0 59.488 23.68l32.608-81.92c0.576 0.032 1.088 0.32 1.664 0.32h154.848l38.176 83.104a31.968 31.968 0 1 0 58.144-26.72l-153.312-333.76zM599.68 680l47.264-118.72 54.528 118.72H599.68z" p-id="4227"></path></svg>
+                
+                <span>AI</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/cs' target="_blank">
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342654057" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9507" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M954.1888 786.3552h-332.032v178.176h130.8416c16.0256 0 29.4912 12.928 29.4912 29.4656 0 16.5632-12.928 30.0032-29.4912 30.0032H271.0016a29.4912 29.4912 0 0 1-29.4912-29.4912c0-16.5376 12.928-29.9776 29.4912-29.9776h130.3296v-178.176H69.8112A69.8368 69.8368 0 0 1 0 716.544V69.8112A70.1696 70.1696 0 0 1 69.8112 0h884.3776A69.8368 69.8368 0 0 1 1024 69.8112V716.544a69.8368 69.8368 0 0 1-69.8112 69.8112z m-492.8768 178.176h100.864v-178.176h-100.864v178.176zM964.5312 59.4688H59.4688v667.4176h905.0624V59.4688zM175.3344 364.8512l107.5456-108.0832c5.7088-5.6832 12.9536-8.7808 21.2224-8.7808 7.7568 0 15.5136 3.0976 21.1968 8.7808 11.904 11.392 11.3664 30.5152 0 41.8816l-92.0576 92.0832 92.0576 92.032a30.1568 30.1568 0 0 1-0.512 42.4192 28.16 28.16 0 0 1-20.6848 8.7808c-7.7568 0-15.0016-3.0976-20.6848-8.7808l-107.0592-107.0592-1.024-1.024a59.52 59.52 0 0 1-5.7088-4.6592 29.2864 29.2864 0 0 1-8.7808-21.1968v-1.0496c0-8.2688 3.0976-15.5136 8.7808-21.1968a23.3472 23.3472 0 0 1 5.7088-4.1472z m391.4752-112.7424a30.9248 30.9248 0 0 1 25.8816-15.488c5.1712 0 10.3424 1.536 14.976 4.1216 7.2448 4.1216 11.904 10.3424 13.9776 18.0992 2.0736 7.7568 1.024 16.0256-3.0976 22.7584l-160.8448 278.2464a30.1312 30.1312 0 0 1-40.3456 10.8544 29.2352 29.2352 0 0 1-11.3664-40.3456l160.8192-278.2464z m123.1104 41.9072c0-8.2944 3.0976-15.5136 8.7808-21.2224 5.6832-5.6832 13.44-8.7808 21.1968-8.7808 7.7568 0 15.0016 3.0976 20.6848 8.7808l107.0592 107.0592 1.0496 0.512c2.048 1.0496 4.1216 2.5856 5.6832 4.1472 5.6832 5.6832 8.7808 13.44 8.7808 21.1968v3.1232c-0.512 7.2448-3.6096 13.952-8.7808 19.1232-1.5616 1.536-3.0976 2.5856-5.1712 5.6832l-108.1088 108.0832a30.08 30.08 0 0 1-21.1968 8.8064c-8.2688 0-15.5136-3.0976-21.1968-8.8064a30.1568 30.1568 0 0 1-8.7808-21.1968c0-8.2688 3.0976-15.5136 8.7808-21.1968l92.0576-92.0576-92.0576-92.0576a30.1568 30.1568 0 0 1-8.7808-21.1968z" fill="#7C848E" p-id="9508"></path></svg>
+                
+                <span>CS基础</span>
+            </a>
+        </li>
+        
+        
+        <li  class='current' >
+            <a href='/ops/' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342768989" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11403" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M685.1 727.2h4.1c77.5-19 135.9-69.3 150.9-133.2 8.2-36.7 1.4-66.6-1.4-77.5-17.7-69.3-77.5-119.6-150.9-126.4h-19c-32.6-59.8-95.2-96.5-163.1-96.5-91.1 0-168.6 66.6-183.5 153.6-73.4 4.1-130.5 63.9-130.5 138.7 0 77.5 63.9 140 141.4 140h334.4M656.4 672H346.7c-51.6 0-93.2-41.6-93.2-91.9 0-51.6 41.6-93.2 93.2-93.2h2.5l20.1 1.3 1.3-18.9c5-70.5 64.2-124.7 134.7-124.7 52.9 0 100.7 31.5 123.4 79.3l6.3 12.6 13.9-1.3c7.6-1.3 13.9-1.3 22.7-1.3 51.6 5 93.2 40.3 105.8 89.4 2.5 7.6 7.6 29 1.3 54.1-10.1 44.1-52.9 79.3-108.3 94.4" fill="#444444" p-id="11404"></path><path d="M949.7 475c-13.3 0-25-9.7-27.1-23.3C908 357.5 860 271 787.4 208.2c-35.9-31.1-76.6-55.3-120.8-72.1-45.8-17.4-94-26.2-143.4-26.2-136.4 0-262.7 68.1-337.8 182.3-8.4 12.7-25.4 16.2-38.1 7.9-12.7-8.4-16.2-25.4-7.9-38.1C224.7 132.4 368.2 55 523.2 55c56.1 0 110.9 10 162.9 29.8 50.2 19.1 96.4 46.6 137.2 81.9 82.4 71.3 137 169.5 153.6 276.7 2.3 15-8 29.1-23 31.4-1.4 0.1-2.8 0.2-4.2 0.2zM523.2 973.2c-62 0-122.1-12.1-178.7-36.1-54.7-23.1-103.8-56.2-145.9-98.4-42.2-42.2-75.3-91.3-98.4-145.9-24-56.6-36.1-116.8-36.1-178.7 0-15.5 0.8-31.2 2.3-46.6 1.5-15.1 15-26.1 30.1-24.6 15.1 1.5 26.1 15 24.6 30.1-1.4 13.6-2.1 27.4-2.1 41.1 0 54.6 10.7 107.5 31.7 157.3 20.4 48.1 49.5 91.3 86.6 128.5 37.1 37.1 80.3 66.3 128.5 86.6 49.8 21.1 102.7 31.7 157.3 31.7 86.1 0 168.4-26.7 237.7-77.3 33.4-24.4 62.8-53.6 87.4-86.8 24.9-33.6 44.3-70.7 57.6-110.1 4.9-14.4 20.5-22.1 34.9-17.2 14.4 4.9 22.1 20.5 17.2 34.9-15.2 44.8-37.3 86.9-65.5 125.1-27.9 37.7-61.3 70.9-99.3 98.6-78.6 57.5-172 87.8-269.9 87.8z" fill="#444444" p-id="11405"></path><path d="M75.5 405.1l-56.6 98c-6.2 10.8 1.6 24.2 14 24.2H146c12.4 0 20.2-13.5 14-24.2l-56.6-98c-6.2-10.7-21.7-10.7-27.9 0zM952.3 501.2l54.4-94.2c6.7-11.6-1.7-26.1-15.1-26.1H882.8c-13.4 0-21.8 14.5-15.1 26.1l54.4 94.2c6.8 11.6 23.5 11.6 30.2 0z" fill="#444444" p-id="11406"></path></svg>
+                
+                <span>运维&amp;工具</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#磁盘分区">磁盘分区</a>
+      <ol>
+        <li><a href="#parted相关命令">parted相关命令</a></li>
+        <li><a href="#通过新增磁盘来创建物理卷">通过新增磁盘来创建物理卷</a></li>
+      </ol>
+    </li>
+    <li><a href="#物理卷">物理卷</a></li>
+    <li><a href="#卷组">卷组</a>
+      <ol>
+        <li><a href="#创建卷组">创建卷组</a></li>
+        <li><a href="#卷组扩缩容">卷组扩/缩容</a></li>
+      </ol>
+    </li>
+    <li><a href="#逻辑卷">逻辑卷</a>
+      <ol>
+        <li><a href="#创建逻辑卷">创建逻辑卷</a></li>
+        <li><a href="#扩充逻辑卷">扩充逻辑卷</a></li>
+        <li><a href="#逻辑卷缩容">逻辑卷缩容</a></li>
+      </ol>
+    </li>
+    <li><a href="#挂载文件系统">挂载文件系统</a>
+      <ol>
+        <li><a href="#手动挂载">手动挂载</a></li>
+        <li><a href="#开机自动挂载">开机自动挂载</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/">LVM相关命令</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 11, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 6 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p><strong>摘要:</strong>
+本文详细介绍了Linux Volume Manager (LVM) 的相关命令，包括磁盘分区、物理卷创建、卷组管理、逻辑卷创建与管理、文件系统挂载与自动挂载等步骤。LVM 是一种逻辑卷管理技术，允许用户在物理磁盘上创建、扩展、缩减和移动分区，而不必重新分区或重新格式化磁盘。通过LVM，可以更灵活地管理存储空间，提高存储利用率和灵活性。</p>
+<p>参考链接：https://support.huaweicloud.com/bestpractice-evs/evs_02_0002.html</p>
+<h2 id="磁盘分区">磁盘分区
+</h2><p>新挂载硬盘或者扩充硬盘</p>
+<h3 id="parted相关命令">parted相关命令
+</h3><p>按照如下命令建立分区、文件系统格式、打上lvm标签</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">lsblk  # 查看挂载磁盘
+</span></span><span class="line"><span class="cl">parted /dev/vdd # 回车后按照以下操作：
+</span></span><span class="line"><span class="cl">mklabel gpt  # 大于2T以上磁盘使用该格式
+</span></span><span class="line"><span class="cl">mkpart p1 ext4  0 100GB # p1 分区名称,ext4 文件系统格式 0 起始位置（百分比or数字），100GB结束位置（百分比or数字）
+</span></span><span class="line"><span class="cl">print #查看分区结果
+</span></span><span class="line"><span class="cl">toggle 3 lvm  # 3 新创建分区的编号，lvm 标签，从而可以使用lvm来管理
+</span></span><span class="line"><span class="cl">quit # 退出parted命令
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">lsblk #查看分区情况
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过新增磁盘来创建物理卷">通过新增磁盘来创建物理卷
+</h3><p>pvcreate /dev/vdd3</p>
+<h2 id="物理卷">物理卷
+</h2><ul>
+<li>查看磁盘</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">fdisk -l <span class="p">|</span> grep /dev/vd <span class="p">|</span> grep -v vda
+</span></span><span class="line"><span class="cl">Disk /dev/vdb: 10.7 GB, <span class="m">10737418240</span> bytes, <span class="m">20971520</span> sectors
+</span></span><span class="line"><span class="cl">Disk /dev/vdc: 10.7 GB, <span class="m">10737418240</span> bytes, <span class="m">20971520</span> sectors
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>执行以下命令，将云硬盘创建为物理卷。</li>
+</ul>
+<p>pvcreate 磁盘设备名1 磁盘设备名2 磁盘设备名3</p>
+<p>参数说明如下：</p>
+<p>磁盘设备名：此处需要填写磁盘的设备名称，如果需要批量创建，可以填写多个设备名称，中间以空格间隔。</p>
+<p>命令示例:</p>
+<p><strong>pvcreate /dev/vdb /dev/vdc</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">  pvcreate /dev/vdb /dev/vdc
+</span></span><span class="line"><span class="cl">  Physical volume &#34;/dev/vdb&#34; successfully created.
+</span></span><span class="line"><span class="cl">  Physical volume &#34;/dev/vdc&#34; successfully created.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>执行如下命令，查看系统中物理卷的详细信息。</li>
+</ul>
+<p><strong>pvdisplay</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	pvdisplay
+</span></span><span class="line"><span class="cl">  &#34;/dev/vdc&#34; is a new physical volume of &#34;10.00 GiB&#34;
+</span></span><span class="line"><span class="cl">  --- NEW Physical volume ---
+</span></span><span class="line"><span class="cl">  PV Name               /dev/vdc
+</span></span><span class="line"><span class="cl">  VG Name
+</span></span><span class="line"><span class="cl">  PV Size               10.00 GiB
+</span></span><span class="line"><span class="cl">  Allocatable           NO
+</span></span><span class="line"><span class="cl">  PE Size               0
+</span></span><span class="line"><span class="cl">  Total PE              0
+</span></span><span class="line"><span class="cl">  Free PE               0
+</span></span><span class="line"><span class="cl">  Allocated PE          0
+</span></span><span class="line"><span class="cl">  PV UUID               dypyLh-xjIj-PvG3-jD0j-yup5-O7SI-462R7C
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  &#34;/dev/vdb&#34; is a new physical volume of &#34;10.00 GiB&#34;
+</span></span><span class="line"><span class="cl">  --- NEW Physical volume ---
+</span></span><span class="line"><span class="cl">  PV Name               /dev/vdb
+</span></span><span class="line"><span class="cl">  VG Name
+</span></span><span class="line"><span class="cl">  PV Size               10.00 GiB
+</span></span><span class="line"><span class="cl">  Allocatable           NO
+</span></span><span class="line"><span class="cl">  PE Size               0
+</span></span><span class="line"><span class="cl">  Total PE              0
+</span></span><span class="line"><span class="cl">  Free PE               0
+</span></span><span class="line"><span class="cl">  Allocated PE          0
+</span></span><span class="line"><span class="cl">  PV UUID               srv5H1-tgLu-GRTl-Vns8-GfNK-jtHk-Ag4HHB
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="卷组">卷组
+</h2><h3 id="创建卷组">创建卷组
+</h3><ul>
+<li>执行以下命令，创建卷组。</li>
+</ul>
+<p><strong>vgcreate</strong> <em>卷组名</em> <em>物理卷名称1 物理卷名称2 物理卷名称3&hellip;</em></p>
+<p>参数说明如下：</p>
+<p>​	卷组名：可自定义，此处以vgdata为例。</p>
+<p>​	物理卷名称：此处需要填写待添加进卷组的所有物理卷名称，中间以空格隔开。</p>
+<p>命令示例:</p>
+<p><strong>vgcreate vgdata /dev/vdb /dev/vdc</strong></p>
+<p>回显类似如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	vgcreate vgdata /dev/vdb /dev/vdc
+</span></span><span class="line"><span class="cl">  Volume group &#34;vgdata&#34; successfully created
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>执行如下命令，查看系统中卷组的详细信息。</li>
+</ul>
+<p><strong>vgdisplay</strong></p>
+<h3 id="卷组扩缩容">卷组扩/缩容
+</h3><ul>
+<li>
+<p>查看磁盘，并如创建物理卷</p>
+<p>fdisk -l | grep /dev/vd | grep -v vda</p>
+<p><strong>pvcreate</strong> <em>磁盘**设备名</em></p>
+</li>
+<li>
+<p>添加新的物理卷</p>
+<p><strong>vgextend</strong> <em>卷组名称</em>   <em>物理卷名称</em></p>
+<p>命令示例:</p>
+<p><strong>vgextend vgdata /dev/vdd</strong></p>
+</li>
+<li>
+<p>删除物理卷</p>
+<p>vgreduce <em>卷组名称</em>   <em>物理卷名称</em></p>
+<p>命令示例:</p>
+<p><strong>vgreduce vgdata /dev/vdd</strong></p>
+</li>
+</ul>
+<h2 id="逻辑卷">逻辑卷
+</h2><h3 id="创建逻辑卷">创建逻辑卷
+</h3><ul>
+<li>lvcreate** <strong>-L</strong> <em>逻辑卷大小</em> <strong>-n</strong> <em>逻辑卷名称</em> <em>卷组名称</em></li>
+</ul>
+<p>参数说明如下：</p>
+<p>逻辑卷大小：该值应小于卷组剩余可用空间大小，单位可以选择“MB”或“GB”。</p>
+<p>逻辑卷名称：可自定义，此处以lvdata1为例。</p>
+<p>卷组名称：此处需要填写逻辑卷所在的卷组名称。</p>
+<p>命令示例:</p>
+<p><strong>lvcreate -L 15GB -n lvdata1 vgdata</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">  lvcreate -L 15GB -n lvdata1 vgdata
+</span></span><span class="line"><span class="cl">  Logical volume &#34;lvdata1&#34; created.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>执行如下命令，查询系统中逻辑卷的详细信息。</p>
+<p><strong>lvdisplay</strong></p>
+</li>
+</ul>
+<h3 id="扩充逻辑卷">扩充逻辑卷
+</h3><ul>
+<li>执行如下命令，扩展逻辑卷的容量。</li>
+</ul>
+<p><strong>lvextend -L +增加容量 逻辑卷路径</strong></p>
+<p><strong>参数说明如下：</strong></p>
+<p>增加容量：该值应小于组卷剩余可用空间大小，单位可以选择“MB”或“GB”。</p>
+<p>逻辑卷路径：此处需要填写待扩容的逻辑卷的路径。</p>
+<p><strong>命令示例:</strong> lvextend -L +4GB /dev/vgdata/lvdata1</p>
+<p>回显类似如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">lvextend -L +4GB /dev/vgdata/lvdata1 
+</span></span><span class="line"><span class="cl">Size of logical volume vgdata/lvdata1 changed from 15.00 GiB (3840 extents) to 19.00 GiB (4864 extents). Logical volume vgdata/lvdata1 successfully resized. 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时只是扩展的逻辑卷的容量，在其之上的文件系统也要随之进行扩展才能使用。</p>
+<ul>
+<li>
+<p>执行如下命令，扩展文件系统的容量。</p>
+<p>resize2fs 逻辑卷路径</p>
+<p>命令示例: resize2fs /dev/vgdata/lvdata1</p>
+<p>回显类似如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">resize2fs /dev/vgdata/lvdata1 
+</span></span><span class="line"><span class="cl">resize2fs 1.42.9 (28-Dec-2013) Filesystem at /dev/vgdata/lvdata1 is mounted on /Data1; on-line resizing required old_desc_blocks = 4, new_desc_blocks = 28 The filesystem on /dev/vgdata/lvdata1 is now 3657728 blocks long. 
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>执行如下命令，查看文件系统容量是否增加。</p>
+<p>df -h 回显类似如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">df -h 
+</span></span><span class="line"><span class="cl">Filesystem                  Size  Used Avail Use% Mounted on
+</span></span><span class="line"><span class="cl">/dev/vda2                    39G  1.5G   35G   5% /
+</span></span><span class="line"><span class="cl">devtmpfs                    487M     0  487M   0% /dev
+</span></span><span class="line"><span class="cl">tmpfs                       496M     0  496M   0% /dev/shm
+</span></span><span class="line"><span class="cl">tmpfs                       496M  6.7M  490M   2% /run
+</span></span><span class="line"><span class="cl">tmpfs                       496M     0  496M   0% /sys/fs/cgroup
+</span></span><span class="line"><span class="cl">/dev/vda1                   976M  131M  779M  15% /boot
+</span></span><span class="line"><span class="cl">tmpfs                       100M     0  100M   0% /run/user/0
+</span></span><span class="line"><span class="cl">/dev/mapper/vgdata-lvdata1   19G   44M   18G   1% /Data1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到，文件系统“/dev/mapper/vgdata-lvdata1”的容量相比之前增加了4GB。</p>
+</li>
+</ul>
+<h3 id="逻辑卷缩容">逻辑卷缩容
+</h3><p>不可在线操作，需要先umount 挂载</p>
+<p>主要命令</p>
+<ul>
+<li>umount /Data1   # /data1为挂载路径</li>
+<li>e2fsck -f /dev/vgdata/lvdata1 # 进行磁盘检查</li>
+<li>resize2fs  /dev/vgdata/lvdata1  1G  # 调整文件系统</li>
+<li>lvreduce -L 1GB /dev/vgdata/lvdata   # 通过lvduce命令进行缩</li>
+<li>mount /dev/vgdata/lvdata1 /Data1   # 重新挂载</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">umount /Data1  # /data1为挂载路径
+</span></span><span class="line"><span class="cl">mount |grep Data1|wc -l  # 查看是否成功卸载
+</span></span><span class="line"><span class="cl">lvs |grep Data1 # 查看磁盘状态
+</span></span><span class="line"><span class="cl">e2fsck -f /dev/vgdata/lvdata1 # 进行磁盘检查
+</span></span><span class="line"><span class="cl">resize2fs  /dev/vgdata/lvdata1  1G  # 调整文件系统
+</span></span><span class="line"><span class="cl">lvs |grep Data1 # 查看磁盘状态，未发生变化
+</span></span><span class="line"><span class="cl">lvreduce -L 1GB /dev/vgdata/lvdata   # 通过lvduce命令进行缩
+</span></span><span class="line"><span class="cl">lvs |grep Data1 # 查看磁盘状态，可发现减少
+</span></span><span class="line"><span class="cl">mount /dev/vgdata/lvdata1 /Data1   # 重新挂载
+</span></span><span class="line"><span class="cl">df -lh |grep Data1  # 查看当前状态
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="挂载文件系统">挂载文件系统
+</h2><ul>
+<li>执行如下命令，创建文件系统。</li>
+</ul>
+<p>**mkfs.**<em>文件格式</em> <em>逻辑卷路径</em></p>
+<p>命令示例:</p>
+<p><strong>mkfs.ext4 /dev/vgdata/lvdata1</strong></p>
+<p>回显类似如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mkfs.ext4 /dev/vgdata/lvdata1
+</span></span><span class="line"><span class="cl">mke2fs 1.42.9 (28-Dec-2013)
+</span></span><span class="line"><span class="cl">Filesystem label=
+</span></span><span class="line"><span class="cl">OS type: Linux
+</span></span><span class="line"><span class="cl">Block size=4096 (log=2)
+</span></span><span class="line"><span class="cl">Fragment size=4096 (log=2)
+</span></span><span class="line"><span class="cl">Stride=0 blocks, Stripe width=0 blocks
+</span></span><span class="line"><span class="cl">983040 inodes, 3932160 blocks
+</span></span><span class="line"><span class="cl">196608 blocks (5.00%) reserved for the super user
+</span></span><span class="line"><span class="cl">First data block=0
+</span></span><span class="line"><span class="cl">Maximum filesystem blocks=2151677952
+</span></span><span class="line"><span class="cl">120 block groups
+</span></span><span class="line"><span class="cl">32768 blocks per group, 32768 fragments per group
+</span></span><span class="line"><span class="cl">8192 inodes per group
+</span></span><span class="line"><span class="cl">Superblock backups stored on blocks:
+</span></span><span class="line"><span class="cl">        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Allocating group tables: done
+</span></span><span class="line"><span class="cl">Writing inode tables: done
+</span></span><span class="line"><span class="cl">Creating journal (32768 blocks): done
+</span></span><span class="line"><span class="cl">Writing superblocks and filesystem accounting information: done
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="手动挂载">手动挂载
+</h3><p>具备文件系统后才可以挂载</p>
+<ul>
+<li>创建挂载目录。
+<strong>mkdir</strong> <em>挂载目录</em>
+命令示例:
+<strong>mkdir /Data1</strong></li>
+<li>执行如下命令，将文件系统挂载到目录下。
+<strong>mount</strong> <em>逻辑卷路径</em> <em>挂载目录</em>
+命令示例：
+<strong>mount</strong> <strong>/dev/vgdata/lvdata1 /Data1</strong></li>
+<li>执行如下命令，查询文件系统挂载信息。
+<strong>mount | grep</strong> <em>挂载目录</em>
+命令示例：
+<strong>mount | grep</strong> <strong>/Data1</strong></li>
+</ul>
+<p>​		回显类似如下信息：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">mount | grep /Data1
+</span></span><span class="line"><span class="cl">/dev/mapper/vgdata-lvdata1 on /Data1 type ext4 (rw,relatime,data=ordered)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="开机自动挂载">开机自动挂载
+</h3><p>执行以下步骤，设置云服务器系统启动时自动挂载文件系统。</p>
+<ul>
+<li>
+<p>执行如下命令，查询文件系统的UUID。</p>
+<p>blkid 文件系统路径</p>
+<p>以查询“dev/mapper/vgdata-lvdata1”的UUID为例：</p>
+<p>blkid /dev/mapper/vgdata-lvdata1</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">blkid /dev/mapper/vgdata-lvdata1
+</span></span><span class="line"><span class="cl">/dev/mapper/vgdata-lvdata1: UUID=&#34;c6a243ce-5150-41ac-8816-39db54d1a4b8&#34; TYPE=&#34;ext4&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>执行以下命令，打开“/etc/fstab”文件。</p>
+<p>vi /etc/fstab</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">vi /etc/fstab
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#
+</span></span><span class="line"><span class="cl"># /etc/fstab
+</span></span><span class="line"><span class="cl"># Created by anaconda on Tue Nov  7 14:28:26 2017
+</span></span><span class="line"><span class="cl">#
+</span></span><span class="line"><span class="cl"># Accessible filesystems, by reference, are maintained under &#39;/dev/disk&#39;
+</span></span><span class="line"><span class="cl"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+</span></span><span class="line"><span class="cl">#
+</span></span><span class="line"><span class="cl">UUID=27f9be47-838b-4155-b20b-e4c5e013cdf3 /                       ext4    defaults        1 1
+</span></span><span class="line"><span class="cl">UUID=2b2000b1-f926-4b6b-ade8-695ee244a901 /boot                   ext4    defaults        1 2
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>按“i”进入编辑模式，将光标移至文件末尾，按“Enter”，添加如下内容。</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">UUID=c6a243ce-5150-41ac-8816-39db54d1a4b8 /Data1                  ext4    defaults        0 0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>内容说明如下：</p>
+<p>第一列：UUID，此处填写1查询的UUID；</p>
+<p>第二列：文件系统的挂载目录；</p>
+<p>第三列：文件系统的文件格式，如文件格式“ext4”;</p>
+<p>第四列：挂载选项，此处以“defaults”为例；</p>
+<p>第五列：备份选项，设置为“1”时，系统自动对该文件系统进行备份；设置为“0”时，不进行备份。此处以“0”为例；</p>
+<p>第六列：扫描选项，设置为“1”时，系统在启动时自动对该文件系统进行扫描；设置为“0”时，不进行扫描。此处以“0”为例。</p>
+<ul>
+<li>
+<p>按“Esc”，输入“:wq!”，并按“Enter”。保存设置并退出vi编辑器。</p>
+</li>
+<li>
+<p>执行以下步骤，验证自动挂载功能</p>
+<ul>
+<li>
+<p>执行如下命令，卸载文件系统。</p>
+<p>umount 逻辑卷路径</p>
+<p>命令示例： umount /dev/vgdata/lvdata1</p>
+</li>
+<li>
+<p>执行如下命令，将/etc/fstab文件所有内容重新加载。</p>
+<p>mount -a</p>
+</li>
+<li>
+<p>执行如下命令，查询文件系统挂载信息。</p>
+<p>mount | grep 挂载目录</p>
+<p>命令示例： mount | grep /Data1</p>
+<p>回显类似如下信息，说明自动挂载功能生效：</p>
+</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    mount | grep /Data1
+</span></span><span class="line"><span class="cl">    /dev/mapper/vgdata-lvdata1 on /Data1 type ext4 (rw,relatime,data=ordered)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>​</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2025 流年
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.aaeac44545d266267249952419e48a1186aba78a56bdb962b00495ea3a337cd9.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
