@@ -8,13 +8,14 @@
         <language>zh-cn</language>
         <copyright>流年</copyright>
         <lastBuildDate>Thu, 16 May 2024 02:54:56 +0800</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>搭建个人博客--基于hugo</title>
+        <title>搭建Markdown博客--基于hugo</title>
         <link>http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</link>
         <pubDate>Thu, 16 May 2024 02:54:56 +0800</pubDate>
         
         <guid>http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</guid>
         <description>&lt;p&gt;&lt;strong&gt;摘要：&lt;/strong&gt;
-搭建个人博客&amp;ndash;基于hugo&lt;/p&gt;
+本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。&lt;/p&gt;
+&lt;p align=&#34;right&#34; &gt;&lt;i&gt;Powered by &lt;/i&gt;&lt;b&gt;百度Comate&lt;/b&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;基本思路&lt;/strong&gt;：&lt;/p&gt;
 &lt;p&gt;使用在本地编辑Markdown文档，并测试预览。成功后推送到github私有仓库。hugo可以将markdown文档渲染为html文件。可以使用github的pages服务对外暴漏，也可在vps中启动一个容器来对外暴漏。&lt;/p&gt;
 &lt;h2 id=&#34;1-本地编辑环境搭建&#34;&gt;1. 本地编辑环境搭建
@@ -628,14 +629,20 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# COPY cert /etc/nginx/cert&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;RUN&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;apk&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;update&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;apk&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;add&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;git&lt;/span&gt;  &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; \
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;git&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;clone&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;https&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;//&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;github&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;com&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Williamyzd&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;blogs&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;html&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;git&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;home&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;public&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; \
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;echo $(date +%Y-%m-&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;%d&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;) $(date +%H:%M:%S) [info]: $(cd /home/public &amp;amp;&amp;amp; git pull) &amp;gt;&amp;gt; /var/log/blog/$(date +%Y-%m-&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;%d&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;).log&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;home&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;blog&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sh&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; \
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;echo \$(date +%Y-%m-&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;%d&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;) \$(date +%H:%M:%S) [info]: \$(cd /home/public &amp;amp;&amp;amp; git pull) &amp;gt;&amp;gt; /var/log/blog/\$(date +%Y-%m-&lt;/span&gt;&lt;span class=&#34;si&#34;&gt;%d&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;).log&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;home&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;blog&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sh&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; \
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;chmod&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;home&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;blog&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sh&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; \
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;mkdir&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;var&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;blog&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; \
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;*/1 * * * *  /home/blog.sh&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;crontabs&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;root&lt;/span&gt; 
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;CMD&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;crond&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;nginx&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;tail&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;dev&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;null&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;blog.conf参考(未包含https配置)：&lt;/p&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Dockerfile 内容说明：
+这里使用了更加轻量版的alpine版本nginx，并安装了git。这个镜像本身具备定时功能，创建了一个定时任务，每天执行一次git pull命令。因&lt;a class=&#34;link&#34; href=&#34;https://github.com/Williamyzd/blogs-html.git&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;仓库&lt;/a&gt;是只读且对外公开，所以这里不需要认证。最后的启动命令是先启动定时任务，再启动nginx服务。同时保留一个主进程，保证容器不会退出。&lt;/li&gt;
+&lt;li&gt;nginx配置文件参考：
+blog.conf参考(未包含https配置)：&lt;/li&gt;
+&lt;/ul&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
@@ -658,7 +665,8 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;一些ssl配置的例子：https://cloud.baidu.com/doc/CAS/s/ikbkfns3k,需要提前准备下证书，并将dockerfile 中的注释去掉。&lt;/p&gt;
+&lt;/div&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://cloud.baidu.com/doc/CAS/s/ikbkfns3k&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;ssl配置的例子&lt;/a&gt;,需要提前准备下证书，并将dockerfile 中的注释去掉。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
@@ -746,10 +754,167 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            - &amp;#34;443:443&amp;#34;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h3 id=&#34;制作基础镜像&#34;&gt;制作基础镜像
-&lt;/h3&gt;&lt;h3 id=&#34;设置git定时任务&#34;&gt;设置git定时任务
-&lt;/h3&gt;&lt;p&gt;参考链接：&lt;/p&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;构建并启动容器：
+将ssl证书（可选）、blog.conf、Dockerfile、Dockerfile文件放到同一目录下，执行如下命令：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 一键构建并启动脚本
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker-compose up -d # 如果镜像版本不存在，会自动构建镜像，然后启动镜像
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 如需在启动时，都重新构建镜像可执行如下命令
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker-compose up -d --build   
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 单独构建镜像并启动容器
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 如当前操作环境的架构与目标机器的架构不同，可以构建镜像，并指定操作系统架构，如：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker  build --platform linux/amd64,linux/arm64 -t blog:v1.0 .
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker compose up -d
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 停止脚本
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker-compose down
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;33-使用github-pages托管&#34;&gt;3.3 使用github pages托管
+&lt;/h3&gt;&lt;p&gt;3.2 自建容器的方式部署，需要自备服务器、域名等，成本较高。不具备条件或者想节约成本，可以考虑白嫖github，使用github pages托管静态文件。只需要一些简单的配置即可。
+上文我们已经创建了html文件的仓库：https://github.com/Williamyzd/blogs-html.git 我们只需要在仓库的设置中，开启github pages功能即可。&lt;/p&gt;
 &lt;ul&gt;
+&lt;li&gt;进入仓库设置页面，选择pages选项卡&lt;/li&gt;
+&lt;li&gt;在Source中选择main分支，并选择/（根目录）&lt;/li&gt;
+&lt;li&gt;稍等片刻，即可通过域名访问了。
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/38a5812b77e9d5eee19d5ab76caacfafeb50af93dfe1da5280a1b4524443dfd5.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;38a5812b77e9d5eee19d5ab76caacfafeb50af93dfe1da5280a1b4524443dfd5&#34;
+	
+	
+&gt;&lt;br&gt;
+其中的自定义域名（标红的3），需要有自己的域名，并在域名解析中添加一条解析记录，指向github pages提供的域名。如本例中，域名pages.liu-nian.top需要添加的记录是：williamyzd.github.io。其模式为[github用户名].github.io。当前域名在百度智能云托管，其添加记录如下：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/2baac64f677a947c9e104e02afd548e91a381474c5f81a2cc9425d0ef58012b3.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;2baac64f677a947c9e104e02afd548e91a381474c5f81a2cc9425d0ef58012b3&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;至此可以愉快地访问自己的博客了。&lt;/p&gt;
+&lt;h2 id=&#34;4-图床搭建-基于github&#34;&gt;4. 图床搭建-基于github
+&lt;/h2&gt;&lt;p&gt;本人主要使用vscode撰写博客，vscode有丰富的插件。关于markdown相关的，当前使用到的如下：
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/60ca70804234640f1dc5041ccac6582cd66f18f9b5cd40fb4391f8f161fc43b0.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;60ca70804234640f1dc5041ccac6582cd66f18f9b5cd40fb4391f8f161fc43b0&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在博客撰写过程中,不免要复制、粘贴图片，如果直接上传到博客中，涉及到图片存储为止的考虑。而huogo中如果想在编写和最终生产环境中能够展示图片，涉及到几处复杂配置。做过几次尝试便放弃了。博主之前使用过picgo等图床工具，可以直接将复制的图片上传到对应的文件服务器，同时生成一个文件的链接，直接插入文档即可。可惜picgo已经停止维护了。常见的图床常见的托管方如七牛、微博、腾讯云、阿里云等是免费的或一定限额的免费。处于不愿受制与人的考量，这里考虑使用github搭建一个自己的图床。&lt;/p&gt;
+&lt;h3 id=&#34;41-创建仓库&#34;&gt;4.1 创建仓库
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;选择创建一个公开的仓库，用于存放图片。&lt;/li&gt;
+&lt;li&gt;进入设置中，创建token，用于插件上传图片时使用。可直接点击链接配置：https://github.com/settings/personal-access-tokens
+github的开发者token可用api的方式对git仓库、账号进行控制。token分为两种，一种是账号级权限控制，另外一种是项目级别的控制。建议选用项目级别控制的 fine-grained personal token。
+红框部分注意填写，其中过期时间根据自己需要填写。
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/93edccc1ae79265b1f563d6b9a8f49b48d933660deff92fd328a5970d48adbbf.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;93edccc1ae79265b1f563d6b9a8f49b48d933660deff92fd328a5970d48adbbf&#34;
+	
+	
+&gt;&lt;br&gt;
+注意选中repo权限，勾选repo的写入权限。
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/6e032947d7f6333696e89ec1731580a522a6a092b48a790086fe2dff5fe6b880.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;6e032947d7f6333696e89ec1731580a522a6a092b48a790086fe2dff5fe6b880&#34;
+	
+	
+&gt;&lt;br&gt;
+创建后页面会显示token信息，进行复制保存，在后续插件配置时使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;42-安装vscode插件&#34;&gt;4.2 安装vscode插件
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/434ee4aab43da4777feec2cfc9a21e429b4f21f439fe89512e1dcc7f19b7aa20.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;434ee4aab43da4777feec2cfc9a21e429b4f21f439fe89512e1dcc7f19b7aa20&#34;
+	
+	
+&gt;&lt;br&gt;
+这里使用markdown-image插件，安装后配置如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;base 配置，主要是选github为默认存储方式、规定图片存储的格式等，其他内容酌情设置
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/da8a92d15310518f18b086e17ec6c436113613534cf0833853b24f12b7ae3ab2.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;da8a92d15310518f18b086e17ec6c436113613534cf0833853b24f12b7ae3ab2&#34;
+	
+	
+&gt;&lt;br&gt;
+File Name Format 这个选项比较关键，建议使用年月方式创建文件夹，当月的文件放在一起，以防止文件过多，导致github仓库管理麻烦货加载缓慢。
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/3cbf15bde600b3173870fc7ea98718228e2d9ed929fb6f9beaa4c57df89e69e0.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;3cbf15bde600b3173870fc7ea98718228e2d9ed929fb6f9beaa4c57df89e69e0&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;li&gt;github配置，主要是填写仓库地址、token等信息。token信息来源于github账号中生成的token。
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/f39a7047dd8ecbe5f13e8ecd25b648a9a3e5f96ea7fad595d782808eb08fef33.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;f39a7047dd8ecbe5f13e8ecd25b648a9a3e5f96ea7fad595d782808eb08fef33&#34;
+	
+	
+&gt;&lt;br&gt;
+至此，图片上传配置完成。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;参考链接：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;图标生成：https://www.iconfont.cn/search/index&lt;/li&gt;
 &lt;li&gt;博客搭建：https://gohugo.io/getting-started/quick-start/&lt;/li&gt;
 &lt;li&gt;ssh设置：https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account&lt;/li&gt;
 &lt;li&gt;博客设置参考：https://yidude.com/html/15.html&lt;/li&gt;

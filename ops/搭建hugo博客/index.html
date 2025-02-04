@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。 Power by 百度Comate\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。\nPowered by 百度Comate\n">
 <title>搭建Markdown博客--基于hugo</title>
 
 <link rel='canonical' href='http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="搭建Markdown博客--基于hugo">
-<meta property='og:description' content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。 Power by 百度Comate\n">
+<meta property='og:description' content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。\nPowered by 百度Comate\n">
 <meta property='og:url' content='http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/'>
 <meta property='og:site_name' content='流年'>
 <meta property='og:type' content='article'><meta property='article:section' content='Ops' /><meta property='article:tag' content='hugo' /><meta property='article:tag' content='markdown' /><meta property='article:published_time' content='2024-05-16T02:54:56&#43;08:00'/><meta property='article:modified_time' content='2024-05-16T02:54:56&#43;08:00'/>
 <meta name="twitter:title" content="搭建Markdown博客--基于hugo">
-<meta name="twitter:description" content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。 Power by 百度Comate\n">
+<meta name="twitter:description" content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。\nPowered by 百度Comate\n">
   
 
 
@@ -388,8 +388,8 @@
     
     
     <p><strong>摘要：</strong>
-本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。
-Power by 百度Comate</p>
+本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。</p>
+<p align="right" ><i>Powered by </i><b>百度Comate</b></p>
 <p><strong>基本思路</strong>：</p>
 <p>使用在本地编辑Markdown文档，并测试预览。成功后推送到github私有仓库。hugo可以将markdown文档渲染为html文件。可以使用github的pages服务对外暴漏，也可在vps中启动一个容器来对外暴漏。</p>
 <h2 id="1-本地编辑环境搭建">1. 本地编辑环境搭建
@@ -1288,6 +1288,7 @@ File Name Format 这个选项比较关键，建议使用年月方式创建文件
 </ul>
 <p>参考链接：</p>
 <ul>
+<li>图标生成：https://www.iconfont.cn/search/index</li>
 <li>博客搭建：https://gohugo.io/getting-started/quick-start/</li>
 <li>ssh设置：https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account</li>
 <li>博客设置参考：https://yidude.com/html/15.html</li>
