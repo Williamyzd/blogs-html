@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="摘要： 搭建个人博客&ndash;基于hugo\n">
-<title>搭建个人博客--基于hugo</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。 Power by 百度Comate\n">
+<title>搭建Markdown博客--基于hugo</title>
 
 <link rel='canonical' href='http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="搭建个人博客--基于hugo">
-<meta property='og:description' content="摘要： 搭建个人博客&ndash;基于hugo\n">
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="搭建Markdown博客--基于hugo">
+<meta property='og:description' content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。 Power by 百度Comate\n">
 <meta property='og:url' content='http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/'>
 <meta property='og:site_name' content='流年'>
-<meta property='og:type' content='article'><meta property='article:section' content='Ops' /><meta property='article:published_time' content='2024-05-16T02:54:56&#43;08:00'/><meta property='article:modified_time' content='2024-05-16T02:54:56&#43;08:00'/>
-<meta name="twitter:title" content="搭建个人博客--基于hugo">
-<meta name="twitter:description" content="摘要： 搭建个人博客&ndash;基于hugo\n">
+<meta property='og:type' content='article'><meta property='article:section' content='Ops' /><meta property='article:tag' content='hugo' /><meta property='article:tag' content='markdown' /><meta property='article:published_time' content='2024-05-16T02:54:56&#43;08:00'/><meta property='article:modified_time' content='2024-05-16T02:54:56&#43;08:00'/>
+<meta name="twitter:title" content="搭建Markdown博客--基于hugo">
+<meta name="twitter:description" content="摘要： 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。 Power by 百度Comate\n">
   
 
 
@@ -307,8 +307,13 @@
       <ol>
         <li><a href="#31-添加静态文件子模块">3.1 添加静态文件子模块</a></li>
         <li><a href="#32-远程服务器部署可选">3.2 远程服务器部署(可选)</a></li>
-        <li><a href="#制作基础镜像">制作基础镜像</a></li>
-        <li><a href="#设置git定时任务">设置git定时任务</a></li>
+        <li><a href="#33-使用github-pages托管">3.3 使用github pages托管</a></li>
+      </ol>
+    </li>
+    <li><a href="#4-图床搭建-基于github">4. 图床搭建-基于github</a>
+      <ol>
+        <li><a href="#41-创建仓库">4.1 创建仓库</a></li>
+        <li><a href="#42-安装vscode插件">4.2 安装vscode插件</a></li>
       </ol>
     </li>
   </ol>
@@ -330,7 +335,7 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/">搭建个人博客--基于hugo</a>
+            <a href="/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/">搭建Markdown博客--基于hugo</a>
         </h2>
     
         
@@ -367,7 +372,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 7 分钟
+                    阅读时长: 11 分钟
                 </time>
             </div>
         
@@ -383,7 +388,8 @@
     
     
     <p><strong>摘要：</strong>
-搭建个人博客&ndash;基于hugo</p>
+本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。
+Power by 百度Comate</p>
 <p><strong>基本思路</strong>：</p>
 <p>使用在本地编辑Markdown文档，并测试预览。成功后推送到github私有仓库。hugo可以将markdown文档渲染为html文件。可以使用github的pages服务对外暴漏，也可在vps中启动一个容器来对外暴漏。</p>
 <h2 id="1-本地编辑环境搭建">1. 本地编辑环境搭建
@@ -997,14 +1003,20 @@
 </span></span><span class="line"><span class="cl"><span class="c1"># COPY cert /etc/nginx/cert</span>
 </span></span><span class="line"><span class="cl"><span class="n">RUN</span> <span class="n">apk</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">apk</span> <span class="n">add</span> <span class="n">git</span>  <span class="o">&amp;&amp;</span> \
 </span></span><span class="line"><span class="cl"><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Williamyzd</span><span class="o">/</span><span class="n">blogs</span><span class="o">-</span><span class="n">html</span><span class="o">.</span><span class="n">git</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">public</span> <span class="o">&amp;&amp;</span> \
-</span></span><span class="line"><span class="cl"><span class="n">echo</span> <span class="s2">&#34;echo $(date +%Y-%m-</span><span class="si">%d</span><span class="s2">) $(date +%H:%M:%S) [info]: $(cd /home/public &amp;&amp; git pull) &gt;&gt; /var/log/blog/$(date +%Y-%m-</span><span class="si">%d</span><span class="s2">).log&#34;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">blog</span><span class="o">.</span><span class="n">sh</span> <span class="o">&amp;&amp;</span> \
+</span></span><span class="line"><span class="cl"><span class="n">echo</span> <span class="s2">&#34;echo \$(date +%Y-%m-</span><span class="si">%d</span><span class="s2">) \$(date +%H:%M:%S) [info]: \$(cd /home/public &amp;&amp; git pull) &gt;&gt; /var/log/blog/\$(date +%Y-%m-</span><span class="si">%d</span><span class="s2">).log&#34;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">blog</span><span class="o">.</span><span class="n">sh</span> <span class="o">&amp;&amp;</span> \
 </span></span><span class="line"><span class="cl"><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">blog</span><span class="o">.</span><span class="n">sh</span> <span class="o">&amp;&amp;</span> \
 </span></span><span class="line"><span class="cl"><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">blog</span> <span class="o">&amp;&amp;</span> \
 </span></span><span class="line"><span class="cl"><span class="n">echo</span> <span class="s2">&#34;*/1 * * * *  /home/blog.sh&#34;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">crontabs</span><span class="o">/</span><span class="n">root</span> 
 </span></span><span class="line"><span class="cl"><span class="n">CMD</span> <span class="n">crond</span> <span class="o">&amp;&amp;</span> <span class="n">nginx</span> <span class="o">&amp;&amp;</span> <span class="n">tail</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>blog.conf参考(未包含https配置)：</p>
+</div><ul>
+<li>Dockerfile 内容说明：
+这里使用了更加轻量版的alpine版本nginx，并安装了git。这个镜像本身具备定时功能，创建了一个定时任务，每天执行一次git pull命令。因<a class="link" href="https://github.com/Williamyzd/blogs-html.git"  target="_blank" rel="noopener"
+    >仓库</a>是只读且对外公开，所以这里不需要认证。最后的启动命令是先启动定时任务，再启动nginx服务。同时保留一个主进程，保证容器不会退出。</li>
+<li>nginx配置文件参考：
+blog.conf参考(未包含https配置)：</li>
+</ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -1027,7 +1039,8 @@
 </span></span><span class="line"><span class="cl">}
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>一些ssl配置的例子：https://cloud.baidu.com/doc/CAS/s/ikbkfns3k,需要提前准备下证书，并将dockerfile 中的注释去掉。</p>
+</div><p><a class="link" href="https://cloud.baidu.com/doc/CAS/s/ikbkfns3k"  target="_blank" rel="noopener"
+    >ssl配置的例子</a>,需要提前准备下证书，并将dockerfile 中的注释去掉。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -1115,9 +1128,165 @@
 </span></span><span class="line"><span class="cl">            - &#34;443:443&#34;
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="制作基础镜像">制作基础镜像
-</h3><h3 id="设置git定时任务">设置git定时任务
-</h3><p>参考链接：</p>
+</div><ul>
+<li>构建并启动容器：
+将ssl证书（可选）、blog.conf、Dockerfile、Dockerfile文件放到同一目录下，执行如下命令：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 一键构建并启动脚本
+</span></span><span class="line"><span class="cl">docker-compose up -d # 如果镜像版本不存在，会自动构建镜像，然后启动镜像
+</span></span><span class="line"><span class="cl"># 如需在启动时，都重新构建镜像可执行如下命令
+</span></span><span class="line"><span class="cl">docker-compose up -d --build   
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 单独构建镜像并启动容器
+</span></span><span class="line"><span class="cl"># 如当前操作环境的架构与目标机器的架构不同，可以构建镜像，并指定操作系统架构，如：
+</span></span><span class="line"><span class="cl">docker  build --platform linux/amd64,linux/arm64 -t blog:v1.0 .
+</span></span><span class="line"><span class="cl">docker compose up -d
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 停止脚本
+</span></span><span class="line"><span class="cl">docker-compose down
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="33-使用github-pages托管">3.3 使用github pages托管
+</h3><p>3.2 自建容器的方式部署，需要自备服务器、域名等，成本较高。不具备条件或者想节约成本，可以考虑白嫖github，使用github pages托管静态文件。只需要一些简单的配置即可。
+上文我们已经创建了html文件的仓库：https://github.com/Williamyzd/blogs-html.git 我们只需要在仓库的设置中，开启github pages功能即可。</p>
+<ul>
+<li>进入仓库设置页面，选择pages选项卡</li>
+<li>在Source中选择main分支，并选择/（根目录）</li>
+<li>稍等片刻，即可通过域名访问了。
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/38a5812b77e9d5eee19d5ab76caacfafeb50af93dfe1da5280a1b4524443dfd5.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="38a5812b77e9d5eee19d5ab76caacfafeb50af93dfe1da5280a1b4524443dfd5"
+	
+	
+><br>
+其中的自定义域名（标红的3），需要有自己的域名，并在域名解析中添加一条解析记录，指向github pages提供的域名。如本例中，域名pages.liu-nian.top需要添加的记录是：williamyzd.github.io。其模式为[github用户名].github.io。当前域名在百度智能云托管，其添加记录如下：</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/2baac64f677a947c9e104e02afd548e91a381474c5f81a2cc9425d0ef58012b3.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="2baac64f677a947c9e104e02afd548e91a381474c5f81a2cc9425d0ef58012b3"
+	
+	
+></p>
+<p>至此可以愉快地访问自己的博客了。</p>
+<h2 id="4-图床搭建-基于github">4. 图床搭建-基于github
+</h2><p>本人主要使用vscode撰写博客，vscode有丰富的插件。关于markdown相关的，当前使用到的如下：
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/60ca70804234640f1dc5041ccac6582cd66f18f9b5cd40fb4391f8f161fc43b0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="60ca70804234640f1dc5041ccac6582cd66f18f9b5cd40fb4391f8f161fc43b0"
+	
+	
+></p>
+<p>在博客撰写过程中,不免要复制、粘贴图片，如果直接上传到博客中，涉及到图片存储为止的考虑。而huogo中如果想在编写和最终生产环境中能够展示图片，涉及到几处复杂配置。做过几次尝试便放弃了。博主之前使用过picgo等图床工具，可以直接将复制的图片上传到对应的文件服务器，同时生成一个文件的链接，直接插入文档即可。可惜picgo已经停止维护了。常见的图床常见的托管方如七牛、微博、腾讯云、阿里云等是免费的或一定限额的免费。处于不愿受制与人的考量，这里考虑使用github搭建一个自己的图床。</p>
+<h3 id="41-创建仓库">4.1 创建仓库
+</h3><ul>
+<li>选择创建一个公开的仓库，用于存放图片。</li>
+<li>进入设置中，创建token，用于插件上传图片时使用。可直接点击链接配置：https://github.com/settings/personal-access-tokens
+github的开发者token可用api的方式对git仓库、账号进行控制。token分为两种，一种是账号级权限控制，另外一种是项目级别的控制。建议选用项目级别控制的 fine-grained personal token。
+红框部分注意填写，其中过期时间根据自己需要填写。
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/93edccc1ae79265b1f563d6b9a8f49b48d933660deff92fd328a5970d48adbbf.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="93edccc1ae79265b1f563d6b9a8f49b48d933660deff92fd328a5970d48adbbf"
+	
+	
+><br>
+注意选中repo权限，勾选repo的写入权限。
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/6e032947d7f6333696e89ec1731580a522a6a092b48a790086fe2dff5fe6b880.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="6e032947d7f6333696e89ec1731580a522a6a092b48a790086fe2dff5fe6b880"
+	
+	
+><br>
+创建后页面会显示token信息，进行复制保存，在后续插件配置时使用。</li>
+</ul>
+<h3 id="42-安装vscode插件">4.2 安装vscode插件
+</h3><p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/434ee4aab43da4777feec2cfc9a21e429b4f21f439fe89512e1dcc7f19b7aa20.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="434ee4aab43da4777feec2cfc9a21e429b4f21f439fe89512e1dcc7f19b7aa20"
+	
+	
+><br>
+这里使用markdown-image插件，安装后配置如下：</p>
+<ul>
+<li>base 配置，主要是选github为默认存储方式、规定图片存储的格式等，其他内容酌情设置
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/da8a92d15310518f18b086e17ec6c436113613534cf0833853b24f12b7ae3ab2.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="da8a92d15310518f18b086e17ec6c436113613534cf0833853b24f12b7ae3ab2"
+	
+	
+><br>
+File Name Format 这个选项比较关键，建议使用年月方式创建文件夹，当月的文件放在一起，以防止文件过多，导致github仓库管理麻烦货加载缓慢。
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/3cbf15bde600b3173870fc7ea98718228e2d9ed929fb6f9beaa4c57df89e69e0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="3cbf15bde600b3173870fc7ea98718228e2d9ed929fb6f9beaa4c57df89e69e0"
+	
+	
+></li>
+<li>github配置，主要是填写仓库地址、token等信息。token信息来源于github账号中生成的token。
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/f39a7047dd8ecbe5f13e8ecd25b648a9a3e5f96ea7fad595d782808eb08fef33.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="f39a7047dd8ecbe5f13e8ecd25b648a9a3e5f96ea7fad595d782808eb08fef33"
+	
+	
+><br>
+至此，图片上传配置完成。</li>
+</ul>
+<p>参考链接：</p>
 <ul>
 <li>博客搭建：https://gohugo.io/getting-started/quick-start/</li>
 <li>ssh设置：https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account</li>
@@ -1128,6 +1297,14 @@
 
     <footer class="article-footer">
     
+    <section class="article-tags">
+        
+            <a href="/tags/hugo/">Hugo</a>
+        
+            <a href="/tags/markdown/">Markdown</a>
+        
+    </section>
+
 
     </footer>
 
