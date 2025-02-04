@@ -141,7 +141,7 @@
         
         
         <li >
-            <a href='/ai/' >
+            <a href='/ai' >
                 
                 
                 
@@ -153,7 +153,7 @@
         
         
         <li >
-            <a href='/cs' target="_blank">
+            <a href='/cs' >
                 
                 
                 
@@ -164,8 +164,8 @@
         </li>
         
         
-        <li  class='current' >
-            <a href='/ops/' >
+        <li >
+            <a href='/ops' >
                 
                 
                 
@@ -284,24 +284,29 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#本地编辑环境搭建">本地编辑环境搭建</a>
+    <li><a href="#1-本地编辑环境搭建">1. 本地编辑环境搭建</a>
       <ol>
-        <li><a href="#二进制安装hugo">二进制安装hugo</a></li>
-        <li><a href="#源码安装hugo">源码安装hugo</a>
+        <li><a href="#11-二进制安装hugo">1.1 二进制安装hugo</a></li>
+        <li><a href="#12-源码安装hugo可选">1.2 源码安装hugo(可选)</a>
           <ol>
             <li><a href="#安装git">安装git</a></li>
             <li><a href="#安装go">安装go</a></li>
             <li><a href="#安装hugo">安装hugo</a></li>
           </ol>
         </li>
-        <li><a href="#配置ssh-key">配置ssh key</a></li>
-        <li><a href="#克隆主题仓库到本地">克隆主题仓库到本地</a></li>
       </ol>
     </li>
-    <li><a href="#修改主题样式">修改主题样式</a></li>
-    <li><a href="#本地调试">本地调试</a></li>
-    <li><a href="#远程部署">远程部署</a>
+    <li><a href="#2-修改主题样式">2. 修改主题样式</a>
       <ol>
+        <li><a href="#21--配置ssh-key">2.1  配置ssh key</a></li>
+        <li><a href="#22-克隆主题仓库到本地">2.2 克隆主题仓库到本地</a></li>
+        <li><a href="#23-修改主题样式">2.3 修改主题样式</a></li>
+      </ol>
+    </li>
+    <li><a href="#3-远程部署">3. 远程部署</a>
+      <ol>
+        <li><a href="#31-添加静态文件子模块">3.1 添加静态文件子模块</a></li>
+        <li><a href="#32-远程服务器部署可选">3.2 远程服务器部署(可选)</a></li>
         <li><a href="#制作基础镜像">制作基础镜像</a></li>
         <li><a href="#设置git定时任务">设置git定时任务</a></li>
       </ol>
@@ -362,7 +367,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 2 分钟
+                    阅读时长: 7 分钟
                 </time>
             </div>
         
@@ -380,9 +385,9 @@
     <p><strong>摘要：</strong>
 搭建个人博客&ndash;基于hugo</p>
 <p><strong>基本思路</strong>：</p>
-<p>使用在本地编辑Markdown文档，并测试预览。成功后推送到github私有仓库。在vps中运行一个nginx容器，定时拉取github中的文件并对外展示。hugo可以将markdown文档渲染为html文件，在nginx容器中，也只需对外暴漏渲染后的nginx文件即可。</p>
-<h2 id="本地编辑环境搭建">本地编辑环境搭建
-</h2><h3 id="二进制安装hugo">二进制安装hugo
+<p>使用在本地编辑Markdown文档，并测试预览。成功后推送到github私有仓库。hugo可以将markdown文档渲染为html文件。可以使用github的pages服务对外暴漏，也可在vps中启动一个容器来对外暴漏。</p>
+<h2 id="1-本地编辑环境搭建">1. 本地编辑环境搭建
+</h2><h3 id="11-二进制安装hugo">1.1 二进制安装hugo
 </h3><p>直接安装二进制文件，可参考：https://github.com/gohugoio/hugo/releases 下载对应版本并安装
 以mac客户端为例，下载对应版本后解压到指定目录。</p>
 <div class="highlight"><div class="chroma">
@@ -405,7 +410,7 @@
 </span></span><span class="line"><span class="cl">hugo version
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="源码安装hugo">源码安装hugo
+</div><h3 id="12-源码安装hugo可选">1.2 源码安装hugo(可选)
 </h3><p>如需源码安装，以mac客户端为例，需要安装git、hugo。</p>
 <h4 id="安装git">安装git
 </h4><p>mac自带git，无需安装。如需安装或更新，可参考：https://git-scm.com/downloads/mac</p>
@@ -413,17 +418,710 @@
 </h4><p>可参考链接：https://go.dev/dl/选择对应版本的hugo，下载后解压到指定目录。</p>
 <h4 id="安装hugo">安装hugo
 </h4><p>go install github.com/gohugoio/hugo@latest</p>
-<h3 id="配置ssh-key">配置ssh key
-</h3><h3 id="克隆主题仓库到本地">克隆主题仓库到本地
-</h3><h2 id="修改主题样式">修改主题样式
-</h2><h2 id="本地调试">本地调试
-</h2><h2 id="远程部署">远程部署
-</h2><h3 id="制作基础镜像">制作基础镜像
+<h2 id="2-修改主题样式">2. 修改主题样式
+</h2><h3 id="21--配置ssh-key">2.1  配置ssh key
+</h3><p>此处为本地开发环境需要，方便免密提交文件到git仓库。这里以提交到github仓库为例。如果主要在国内访问，且有备案域名，建议使用gitee或自有git仓库。
+可参考链接：
+<a class="link" href="https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent"  target="_blank" rel="noopener"
+    >ssh本地秘钥生成</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ssh-keygen -t ed25519 -C <span class="s2">&#34;your_email@example.com&#34;</span> <span class="c1"># 邮箱为github注册邮箱,一路输入enter即可</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果你使用的是不支持 Ed25519 算法的旧系统，请使用以下命令：</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ssh-keygen -t rsa -b 4096 -C &#34;your_email@example.com&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 将 SSH 私钥添加到 ssh-agent。</span>
+</span></span><span class="line"><span class="cl">ssh-add ~/.ssh/id_ed25519
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看公钥内容，将其复制</span>
+</span></span><span class="line"><span class="cl">cat ~/.ssh/id_ed25519.pub
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>访问自己的github账号，在账号设置中添加ssh公钥
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/7b881804641713f4a08ff31b42fb6a9afa43d85b16fd7948b9dec25d3baf9b71.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="7b881804641713f4a08ff31b42fb6a9afa43d85b16fd7948b9dec25d3baf9b71"
+	
+	
+></p>
+<h3 id="22-克隆主题仓库到本地">2.2 克隆主题仓库到本地
+</h3><p>将自己喜欢的主题克隆到本地，和hugo一起使用。因涉及到对主题的更改和维护，建议使用git 子模块来维护。可以将该主题fork到自己的空间，然后将自己fork的主题作为子模块添加。这里以<a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack"  target="_blank" rel="noopener"
+    >stack主题</a>为例。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 创建第一个站点</span>
+</span></span><span class="line"><span class="cl">hugo new site pages   <span class="c1"># pages 为站点文件夹名字</span>
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> pages
+</span></span><span class="line"><span class="cl">git init <span class="c1"># 注意初始化的相对位置</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 添加主题，以stack为例。注意github仓库地址不要使用https协议的，否则会出现子模块的更改无法提交的情况</span>
+</span></span><span class="line"><span class="cl">git submodule add --name stack  git@github.com:Williamyzd/hugo-theme-stack.git themes/stack
+</span></span><span class="line"><span class="cl"><span class="c1"># 添加一个测试页面</span>
+</span></span><span class="line"><span class="cl">hugo new content content/posts/my-first-post.md
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;hello,word!&#34;</span> &gt;&gt; content/posts/my-first-post.md
+</span></span><span class="line"><span class="cl">hugo server -D -p <span class="m">8000</span> <span class="c1"># 可查看处于草稿状态下的文档内容 -p 制定可对外暴漏端口，默认是1314</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>浏览器访问页面：http://localhost:8000/posts/my-first-post/，可看到发布内容
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/5399d38c70877ccc530aa758912f8ec63bba4072c169d49cfe702eacbea8d5bb.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="5399d38c70877ccc530aa758912f8ec63bba4072c169d49cfe702eacbea8d5bb"
+	
+	
+></p>
+<h3 id="23-修改主题样式">2.3 修改主题样式
+</h3><p>修改主题样式，主要在hugo.toml(yaml)文件中，或者在主题文件夹中修改。可将themes/stack/exampleSite/hugo.yaml 复制到站点根目录，并修改为自己的配置。</p>
+<ul>
+<li>params-sidebar-avatar修改logo</li>
+<li>params-mainSections 指定主页默认获取的最新文章</li>
+<li>menu-main 指定导航模块</li>
+<li>menu-social 指定社交模块</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">baseurl: https://example.com/
+</span></span><span class="line"><span class="cl">languageCode: en-us
+</span></span><span class="line"><span class="cl"><span class="c1"># 主题名称，注意要和子模块的文件夹名一致</span>
+</span></span><span class="line"><span class="cl">theme: stack
+</span></span><span class="line"><span class="cl"><span class="c1"># 网站标题</span>
+</span></span><span class="line"><span class="cl">title: Example Site
+</span></span><span class="line"><span class="cl"><span class="c1"># 版权信息</span>
+</span></span><span class="line"><span class="cl">copyright: Example Person
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 多语言支持相关</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Theme i18n support</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Available values: ar, bn, ca, de, el, en, es, fr, hu, id, it, ja, ko, nl, pt-br, th, uk, zh-cn, zh-hk, zh-tw</span>
+</span></span><span class="line"><span class="cl">DefaultContentLanguage: en
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Set hasCJKLanguage to true if DefaultContentLanguage is in [zh-cn ja ko]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># This will make .Summary and .WordCount behave correctly for CJK languages.</span>
+</span></span><span class="line"><span class="cl">hasCJKLanguage: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">languages:
+</span></span><span class="line"><span class="cl">    en:
+</span></span><span class="line"><span class="cl">        languageName: English
+</span></span><span class="line"><span class="cl">        title: Example Site
+</span></span><span class="line"><span class="cl">        weight: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">        params:
+</span></span><span class="line"><span class="cl">            sidebar:
+</span></span><span class="line"><span class="cl">                subtitle: Example description
+</span></span><span class="line"><span class="cl">    zh-cn:
+</span></span><span class="line"><span class="cl">        languageName: 中文
+</span></span><span class="line"><span class="cl">        title: 演示站点
+</span></span><span class="line"><span class="cl">        weight: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">        params:
+</span></span><span class="line"><span class="cl">            sidebar:
+</span></span><span class="line"><span class="cl">                subtitle: 演示说明
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">pagination:
+</span></span><span class="line"><span class="cl">    pagerSize: <span class="m">3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">permalinks:
+</span></span><span class="line"><span class="cl">    post: /p/:slug/
+</span></span><span class="line"><span class="cl">    page: /:slug/
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">params:
+</span></span><span class="line"><span class="cl">    <span class="c1"># 这个参数比较关键，决定主页回去哪些目录下去取最新的文章来显示</span>
+</span></span><span class="line"><span class="cl">    mainSections:
+</span></span><span class="line"><span class="cl">        - ai
+</span></span><span class="line"><span class="cl">        - cs
+</span></span><span class="line"><span class="cl">        - ops
+</span></span><span class="line"><span class="cl">        - tools
+</span></span><span class="line"><span class="cl">    featuredImageField: image
+</span></span><span class="line"><span class="cl">    rssFullContent: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">    favicon: <span class="c1"># e.g.: favicon placed in `static/favicon.ico` of your site folder, then set this field to `/favicon.ico` (`/` is necessary)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    footer:
+</span></span><span class="line"><span class="cl">        since: <span class="m">2020</span>
+</span></span><span class="line"><span class="cl">        customText:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    dateFormat:
+</span></span><span class="line"><span class="cl">        published: Jan 02, <span class="m">2006</span>
+</span></span><span class="line"><span class="cl">        lastUpdated: Jan 02, <span class="m">2006</span> 15:04 MST
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    sidebar:
+</span></span><span class="line"><span class="cl">        emoji: 🍥
+</span></span><span class="line"><span class="cl">        subtitle: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</span></span><span class="line"><span class="cl">        avatar:
+</span></span><span class="line"><span class="cl">            enabled: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">            local: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">            src: img/avatar.png   <span class="c1"># logo存放的位置，在`static/img/`下</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    article:
+</span></span><span class="line"><span class="cl">        math: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">        toc: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        readingTime: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        license:
+</span></span><span class="line"><span class="cl">            enabled: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">            default: Licensed under CC BY-NC-SA 4.0
+</span></span><span class="line"><span class="cl"><span class="c1"># 是否开启评论，建议不开</span>
+</span></span><span class="line"><span class="cl">    comments:
+</span></span><span class="line"><span class="cl">        enabled: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">        provider: disqus
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="c1"># 默认会开启的几个组件：搜索、归档、分类、标签云</span>
+</span></span><span class="line"><span class="cl">    widgets:
+</span></span><span class="line"><span class="cl">        homepage:
+</span></span><span class="line"><span class="cl">            - type: search
+</span></span><span class="line"><span class="cl">            - type: archives
+</span></span><span class="line"><span class="cl">              params:
+</span></span><span class="line"><span class="cl">                  limit: <span class="m">5</span>
+</span></span><span class="line"><span class="cl">            - type: categories
+</span></span><span class="line"><span class="cl">              params:
+</span></span><span class="line"><span class="cl">                  limit: <span class="m">10</span>
+</span></span><span class="line"><span class="cl">            - type: tag-cloud
+</span></span><span class="line"><span class="cl">              params:
+</span></span><span class="line"><span class="cl">                  limit: <span class="m">10</span>
+</span></span><span class="line"><span class="cl">        page:
+</span></span><span class="line"><span class="cl">            - type: toc
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    opengraph:
+</span></span><span class="line"><span class="cl">        twitter:
+</span></span><span class="line"><span class="cl">            <span class="c1"># Your Twitter username</span>
+</span></span><span class="line"><span class="cl">            site:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1"># Available values: summary, summary_large_image</span>
+</span></span><span class="line"><span class="cl">            card: summary_large_image
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    defaultImage:
+</span></span><span class="line"><span class="cl">        opengraph:
+</span></span><span class="line"><span class="cl">            enabled: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">            local: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">            src:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    colorScheme:
+</span></span><span class="line"><span class="cl">        <span class="c1"># Display toggle</span>
+</span></span><span class="line"><span class="cl">        toggle: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1"># Available values: auto, light, dark</span>
+</span></span><span class="line"><span class="cl">        default: auto
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    imageProcessing:
+</span></span><span class="line"><span class="cl">        cover:
+</span></span><span class="line"><span class="cl">            enabled: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        content:
+</span></span><span class="line"><span class="cl">            enabled: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">### Custom menu</span>
+</span></span><span class="line"><span class="cl"><span class="c1">### See https://stack.jimmycai.com/config/menu</span>
+</span></span><span class="line"><span class="cl"><span class="c1">### To remove about, archive and search page menu item, remove `menu` field from their FrontMatter</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 自定义的菜单项</span>
+</span></span><span class="line"><span class="cl">menu:
+</span></span><span class="line"><span class="cl">    main: 
+</span></span><span class="line"><span class="cl">        - identifier: ai  <span class="c1">#标识符，唯一值</span>
+</span></span><span class="line"><span class="cl">          name: AI   <span class="c1"># 显示的名称</span>
+</span></span><span class="line"><span class="cl">          url: /ai   <span class="c1"># 文件路径，相对于content文件夹</span>
+</span></span><span class="line"><span class="cl">          weight: -90 <span class="c1">#权重 #权重越小，越靠前显示</span>
+</span></span><span class="line"><span class="cl">          params:
+</span></span><span class="line"><span class="cl">              <span class="c1">### For demonstration purpose, the home link will be open in a new tab</span>
+</span></span><span class="line"><span class="cl">              newTab: <span class="nb">false</span> <span class="c1">#是否新开标签页</span>
+</span></span><span class="line"><span class="cl">              icon: ai <span class="c1"># 图标信息，查看和自定义图标，可修改  themes/stack/assets/icons 下的文件，将文件名写在这里</span>
+</span></span><span class="line"><span class="cl">        - identifier: ops
+</span></span><span class="line"><span class="cl">          name: 运维<span class="p">&amp;</span>工具
+</span></span><span class="line"><span class="cl">          url: /ops
+</span></span><span class="line"><span class="cl">          weight: -90 <span class="c1">#权重</span>
+</span></span><span class="line"><span class="cl">          params:
+</span></span><span class="line"><span class="cl">              <span class="c1">### For demonstration purpose, the home link will be open in a new tab</span>
+</span></span><span class="line"><span class="cl">              newTab: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">              icon: ops <span class="c1">#更多的图标信息见后</span>
+</span></span><span class="line"><span class="cl">        - identifier: cs
+</span></span><span class="line"><span class="cl">          name: CS基础
+</span></span><span class="line"><span class="cl">          url: /cs
+</span></span><span class="line"><span class="cl">          weight: -90 <span class="c1">#权重</span>
+</span></span><span class="line"><span class="cl">          params:
+</span></span><span class="line"><span class="cl">              <span class="c1">### For demonstration purpose, the home link will be open in a new tab</span>
+</span></span><span class="line"><span class="cl">              newTab: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">              icon: cs <span class="c1">#更多的图标信息见后</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    social:
+</span></span><span class="line"><span class="cl">        - identifier: github
+</span></span><span class="line"><span class="cl">          name: GitHub
+</span></span><span class="line"><span class="cl">          url: https://github.com/CaiJimmy/hugo-theme-stack
+</span></span><span class="line"><span class="cl">          params:
+</span></span><span class="line"><span class="cl">              icon: brand-github
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        - identifier: twitter
+</span></span><span class="line"><span class="cl">          name: Twitter
+</span></span><span class="line"><span class="cl">          url: https://twitter.com
+</span></span><span class="line"><span class="cl">          params:
+</span></span><span class="line"><span class="cl">              icon: brand-twitter
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">related:
+</span></span><span class="line"><span class="cl">    includeNewer: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">    threshold: <span class="m">60</span>
+</span></span><span class="line"><span class="cl">    toLower: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">    indices:
+</span></span><span class="line"><span class="cl">        - name: tags
+</span></span><span class="line"><span class="cl">          weight: <span class="m">100</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        - name: categories
+</span></span><span class="line"><span class="cl">          weight: <span class="m">200</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">markup:
+</span></span><span class="line"><span class="cl">    goldmark:
+</span></span><span class="line"><span class="cl">        extensions:
+</span></span><span class="line"><span class="cl">            passthrough:
+</span></span><span class="line"><span class="cl">                enable: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">                delimiters:
+</span></span><span class="line"><span class="cl">                    block:
+</span></span><span class="line"><span class="cl">                        - - <span class="se">\[</span>
+</span></span><span class="line"><span class="cl">                          - <span class="se">\]</span>
+</span></span><span class="line"><span class="cl">                        - - <span class="nv">$$</span>
+</span></span><span class="line"><span class="cl">                          - <span class="nv">$$</span>
+</span></span><span class="line"><span class="cl">                    inline:
+</span></span><span class="line"><span class="cl">                        - - <span class="se">\(</span>
+</span></span><span class="line"><span class="cl">                          - <span class="se">\)</span>
+</span></span><span class="line"><span class="cl">        renderer:
+</span></span><span class="line"><span class="cl">            <span class="c1">## Set to true if you have HTML content inside Markdown</span>
+</span></span><span class="line"><span class="cl">            unsafe: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">    tableOfContents:
+</span></span><span class="line"><span class="cl">        endLevel: <span class="m">4</span>
+</span></span><span class="line"><span class="cl">        ordered: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        startLevel: <span class="m">2</span>
+</span></span><span class="line"><span class="cl">    highlight:
+</span></span><span class="line"><span class="cl">        noClasses: <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">        codeFences: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        guessSyntax: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        lineNoStart: <span class="m">1</span>
+</span></span><span class="line"><span class="cl">        lineNos: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        lineNumbersInTable: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">        tabWidth: <span class="m">4</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>现在可以在content目录下创建文档了。
+最终效果如下：
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/2bdaec3ef2438fbbab30c2fce6df8101c3acc8ff154b9107c2d661981c88fde1.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="2bdaec3ef2438fbbab30c2fce6df8101c3acc8ff154b9107c2d661981c88fde1"
+	
+	
+></p>
+<h2 id="3-远程部署">3. 远程部署
+</h2><p>hugo 生成的静态html文件在public目录下，可以考虑单独创建一个仓库来管理，在主git仓库下再建一个子模块。</p>
+<h3 id="31-添加静态文件子模块">3.1 添加静态文件子模块
+</h3><p>添加子模块主要使用命令如下：</p>
+<ul>
+<li>新建远程仓库：git@github.com:Williamyzd/blogs-html.git</li>
+<li>在主仓库下添加子模块：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git submodule add -n  pub-html git@github.com:Williamyzd/blogs-html.git blog/public
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果 子模块添加错误，可用如下命令删除：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git rm --cached pub-html  <span class="c1"># pub-html:子模块名称</span>
+</span></span><span class="line"><span class="cl">rm -rf blog/public  <span class="c1">#   删除本地文件夹</span>
+</span></span><span class="line"><span class="cl">vim .gitmodules  <span class="c1"># 删除.gitmodules文件中的子模块信息</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="32-远程服务器部署可选">3.2 远程服务器部署(可选)
+</h3><ul>
+<li>创建Dockerfile文件，参考如下：
+如无服务器可用，可以不考虑这一步。
+通过vps（服务器）托管一个nginx服务。dockerfile参考：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="n">FROM</span> <span class="n">nginx</span><span class="p">:</span><span class="mf">1.27</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">alpine</span>
+</span></span><span class="line"><span class="cl"><span class="n">WORKDIR</span> <span class="o">/</span><span class="n">home</span>
+</span></span><span class="line"><span class="cl"><span class="n">COPY</span> <span class="n">blog</span><span class="o">.</span><span class="n">conf</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">nginx</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">default</span><span class="o">.</span><span class="n">conf</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 准备证书,如有可打开</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># COPY cert /etc/nginx/cert</span>
+</span></span><span class="line"><span class="cl"><span class="n">RUN</span> <span class="n">apk</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">apk</span> <span class="n">add</span> <span class="n">git</span>  <span class="o">&amp;&amp;</span> \
+</span></span><span class="line"><span class="cl"><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Williamyzd</span><span class="o">/</span><span class="n">blogs</span><span class="o">-</span><span class="n">html</span><span class="o">.</span><span class="n">git</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">public</span> <span class="o">&amp;&amp;</span> \
+</span></span><span class="line"><span class="cl"><span class="n">echo</span> <span class="s2">&#34;echo $(date +%Y-%m-</span><span class="si">%d</span><span class="s2">) $(date +%H:%M:%S) [info]: $(cd /home/public &amp;&amp; git pull) &gt;&gt; /var/log/blog/$(date +%Y-%m-</span><span class="si">%d</span><span class="s2">).log&#34;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">blog</span><span class="o">.</span><span class="n">sh</span> <span class="o">&amp;&amp;</span> \
+</span></span><span class="line"><span class="cl"><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">blog</span><span class="o">.</span><span class="n">sh</span> <span class="o">&amp;&amp;</span> \
+</span></span><span class="line"><span class="cl"><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="nb">log</span><span class="o">/</span><span class="n">blog</span> <span class="o">&amp;&amp;</span> \
+</span></span><span class="line"><span class="cl"><span class="n">echo</span> <span class="s2">&#34;*/1 * * * *  /home/blog.sh&#34;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">crontabs</span><span class="o">/</span><span class="n">root</span> 
+</span></span><span class="line"><span class="cl"><span class="n">CMD</span> <span class="n">crond</span> <span class="o">&amp;&amp;</span> <span class="n">nginx</span> <span class="o">&amp;&amp;</span> <span class="n">tail</span> <span class="o">-</span><span class="n">f</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>blog.conf参考(未包含https配置)：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">server {    
+</span></span><span class="line"><span class="cl">    listen 80;
+</span></span><span class="line"><span class="cl">    server_name blog.xxx.com;
+</span></span><span class="line"><span class="cl">    location / {
+</span></span><span class="line"><span class="cl">          root  /home/public;
+</span></span><span class="line"><span class="cl">          index index.html index.htm;           
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>一些ssl配置的例子：https://cloud.baidu.com/doc/CAS/s/ikbkfns3k,需要提前准备下证书，并将dockerfile 中的注释去掉。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 以下属性中以ssl开头的属性代表与证书配置有关，其他属性请根据自己的需要进行配置。
+</span></span><span class="line"><span class="cl">server {
+</span></span><span class="line"><span class="cl">   listen 80;
+</span></span><span class="line"><span class="cl">   # 需要调整为您证书绑定的域名。
+</span></span><span class="line"><span class="cl">   server_name blog.xxx.com 
+</span></span><span class="line"><span class="cl">   return 301 https://$host/$request_uri;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">server {
+</span></span><span class="line"><span class="cl">    listen 443 ssl;
+</span></span><span class="line"><span class="cl">    server_name blog.xxx.com;  # localhost修改为您证书绑定的域名。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    ssl_certificate /etc/nginx/cert/domain_ca.crt;   # 将domain_ca.crt替换成您证书链的文件名(如下载文件没有domain_ca.crt则使用domain.crt或domain.pem)。
+</span></span><span class="line"><span class="cl">    ssl_certificate_key /etc/nginx/cert/domain.key;  # 将domain.key替换成您证书的密钥文件名。
+</span></span><span class="line"><span class="cl">    ssl_session_timeout 5m;               # 指定SSL/TLS会话的超时时间
+</span></span><span class="line"><span class="cl">    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;  #使用此加密套件。
+</span></span><span class="line"><span class="cl">    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;   #使用该协议进行配置。
+</span></span><span class="line"><span class="cl">    ssl_prefer_server_ciphers on;   
+</span></span><span class="line"><span class="cl">    location / {
+</span></span><span class="line"><span class="cl">        root  /home/public;   #站点目录。
+</span></span><span class="line"><span class="cl">        index index.html index.htm;   
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}							
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>创建docker-compose.yml文件，参考如下：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">version: &#39;3&#39;    
+</span></span><span class="line"><span class="cl">services:
+</span></span><span class="line"><span class="cl">    blog:
+</span></span><span class="line"><span class="cl">        build: 
+</span></span><span class="line"><span class="cl">            context: .
+</span></span><span class="line"><span class="cl">            dockerfile: Dockerfile
+</span></span><span class="line"><span class="cl">        image: blog:v1.0
+</span></span><span class="line"><span class="cl">        container_name: blog
+</span></span><span class="line"><span class="cl">        restart: always
+</span></span><span class="line"><span class="cl">        ports:
+</span></span><span class="line"><span class="cl">            - &#34;80:80&#34;
+</span></span><span class="line"><span class="cl">            - &#34;443:443&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="制作基础镜像">制作基础镜像
 </h3><h3 id="设置git定时任务">设置git定时任务
 </h3><p>参考链接：</p>
 <ul>
 <li>博客搭建：https://gohugo.io/getting-started/quick-start/</li>
 <li>ssh设置：https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account</li>
+<li>博客设置参考：https://yidude.com/html/15.html</li>
 </ul>
 </section>
 
