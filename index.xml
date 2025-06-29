@@ -7,7 +7,480 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>流年</copyright>
-        <lastBuildDate>Tue, 11 Mar 2025 08:38:25 +0000</lastBuildDate><atom:link href="https://blog.liu-nian.top/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sun, 29 Jun 2025 11:38:25 +0000</lastBuildDate><atom:link href="https://blog.liu-nian.top/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>mcp-server实现图片自动转换</title>
+        <link>https://blog.liu-nian.top/ai/mcp-server%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2/</link>
+        <pubDate>Sun, 29 Jun 2025 11:38:25 +0000</pubDate>
+        
+        <guid>https://blog.liu-nian.top/ai/mcp-server%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2/</guid>
+        <description>&lt;h2 id=&#34;需求背景&#34;&gt;需求背景
+&lt;/h2&gt;&lt;p&gt;将已有的网络图片地址转换为github镜像仓库的地址，插入markdown文档中&lt;/p&gt;
+&lt;h2 id=&#34;使用框架&#34;&gt;使用框架
+&lt;/h2&gt;&lt;p&gt;mcp.server.fastmcp&lt;/p&gt;
+&lt;h2 id=&#34;代码逻辑&#34;&gt;代码逻辑
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;创建github仓库并获取对应仓库的token&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;判断为网络图片还是本地图片。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;网络图片则首选获取其二进制内容&lt;/li&gt;
+&lt;li&gt;本地图片直接读取二进制内容&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;从地址或url中获取文件的格式并保存，如获取不到则默认为png&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;获取文件二进制内容的哈希值，作为文件名。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;获取当前年月，按照’年-月/文件hash‘格式上传到代码仓库路径&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;上传文件前首先尝试调用githu api获取文件在githu仓库的hash值&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;如果上一步的hash存在，则是更新文件，需要在body体中添加’sha‘字段，&lt;/li&gt;
+&lt;li&gt;如果hash不存在则为新文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;发送文件上传请求，获取返回值&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;结果拼接&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;download_url为文件的直接下载地址&lt;/li&gt;
+&lt;li&gt;cdn_url用于展示加速，其拼接逻辑为：https://cdn.jsdelivr.net/gh/{repo}@{branch}/{target_path}&lt;/li&gt;
+&lt;li&gt;基于cdn_url拼接一个markdown格式文件标签&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;天机mcp协议支持&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;实例化mcp: mcp = FastMCP()&lt;/li&gt;
+&lt;li&gt;使用 @mcp.tool将需要转换的函数工具化&lt;/li&gt;
+&lt;li&gt;在main函数中实现mcp server,建议使用stdio本地调用方式，相对安全&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在客户端实现调用
+以 cherry studio为例，分别填下如下内容：
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/5d3ff56d8e7af682dc48b836e0784158529bce426fdf9cb7184f9a33d787384c.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;图 0&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;撰写prompt&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;任务：调用&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;github&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;upload&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;工具，将用户输入的图片地址或传入的图片附件传入到&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;github仓库&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;，并将返回的结果以&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;j字符串形式输出&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;执行要求：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;如果传入的是图片那么将图片地址直接传给工具进行使用，且不需要将图片传给模型。&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;输出要求：&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;不展示图片，返回工具的&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;json格式执行结果&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;no_think&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;效果测试
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/819dfa6f20de2e0ea9f92bee187d7598edd477552ab994fc6a2eafa9bb9a6b5d.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;图 1&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;代码全文&#34;&gt;代码全文
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;  1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;  9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 90
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 91
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 92
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 93
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 94
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 95
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 96
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 97
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 98
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 99
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;100
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;101
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;102
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;103
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;104
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;105
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;106
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;107
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;108
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;109
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;110
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;111
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;112
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;113
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;114
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;115
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;116
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;117
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;118
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;119
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;120
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;121
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;122
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;123
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;124
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;125
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;126
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;127
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;128
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;129
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;130
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;131
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;132
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;133
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;134
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;135
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;136
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;137
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;138
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;139
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;140
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;141
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;142
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;143
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;144
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;145
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;146
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;147
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;148
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;149
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;150
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;151
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;152
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;153
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;154
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;155
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;156
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;157
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;158
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;159
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;160
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;161
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;162
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;163
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;164
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;165
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;166
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;167
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;168
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;169
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;170
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;171
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;172
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;173
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;174
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;175
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;176
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-gdscript3&#34; data-lang=&#34;gdscript3&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;argparse&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;error&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;json&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;base64&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;re&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;hashlib&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;datetime&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;datetime&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;from&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mcp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;server&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fastmcp&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FastMCP&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;mcp&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FastMCP&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 内置配置&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;DEFAULT_REPO&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;# 替换为你的仓库名&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;DEFAULT_TOKEN&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;       &lt;span class=&#34;c1&#34;&gt;# 替换为你的GitHub个人访问令牌&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;is_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&amp;#34;改进的URL检测函数&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;try&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;urlparse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;all&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;([&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;scheme&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;http&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;https&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;netloc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;])&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;except&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;False&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;get_image_content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&amp;#34;改进的内容获取函数&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;try&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;is_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;c1&#34;&gt;# 对URL进行安全编码处理&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;safe_url&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;quote&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;safe&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;:/?&amp;amp;=&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;urlopen&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;safe_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;open&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;rb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;except&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Exception&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;raise&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ValueError&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;读取失败: {str(e)}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;get_file_sha&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;repo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;branch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    获取指定GitHub仓库中文件的SHA值。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    Args:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        repo (str): GitHub仓库的名称，格式为&amp;#39;用户名/仓库名&amp;#39;。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        token (str): GitHub的Personal Access Token。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        branch (str): 仓库的分支名。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        path (str): 文件在仓库中的路径。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    Returns:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        str or None: 文件的SHA值，如果获取失败则返回None。
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    &amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;url&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;https://api.github.com/repos/{repo}/contents/{path}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;headers&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;s2&#34;&gt;&amp;#34;Authorization&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;token {token}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;s2&#34;&gt;&amp;#34;Accept&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;application/vnd.github.v3+json&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;params&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;ref&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;branch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# 手动拼接参数到URL&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;query_string&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;urlencode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;params&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;url_with_params&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{url}?{query_string}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;rs&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;None&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;req&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;url_with_params&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;headers&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;headers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;method&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;GET&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;None&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;try&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;urlopen&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;req&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;json&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;loads&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;rs&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;sha&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;sha&amp;#34;&lt;/span&gt; &lt;span class=&#34;ow&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;None&lt;/span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;finally&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rs&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;calculate_sha1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&amp;#34;计算文件内容的SHA1哈希值&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;sha1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;hashlib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sha1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;sha1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;update&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;sha1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;hexdigest&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;@&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mcp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;tool&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;upload_file&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;repo&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DEFAULT_REPO&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DEFAULT_TOKEN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;branch&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;main&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    Uploads an image file to a specified GitHub repository.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    Args:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        image_path (str): The local file path or URL of the image to upload.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        repo (str, optional): The GitHub repository in the format &amp;#39;owner/repo&amp;#39;. Defaults to DEFAULT_REPO.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        token (str, optional): The GitHub personal access token for authentication. Defaults to DEFAULT_TOKEN.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        branch (str, optional): The branch to upload the file to. Defaults to &amp;#34;main&amp;#34;.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    Returns:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        dict: The JSON response from the GitHub API after uploading the file.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    Raises:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;        RuntimeError: If the upload fails or the GitHub API returns an error.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s2&#34;&gt;    &amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&amp;#34;上传图片到GitHub仓库&amp;#34;&amp;#34;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;try&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;content&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get_image_content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;c1&#34;&gt;# 计算SHA1哈希值&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;file_hash&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;calculate_sha1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;is_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;):&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;c1&#34;&gt;# 尝试从URL中提取扩展名&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;parsed&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;urlparse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;base_name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;basename&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parsed&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;_&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ext&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;splitext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;base_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;filename&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{file_hash}.{ext}&amp;#34;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ext&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{file_hash}.png&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;c1&#34;&gt;# 从本地路径获取扩展名&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;_&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ext&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;os&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;splitext&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;filename&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{file_hash}.{ext}&amp;#34;&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ext&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{file_hash}.png&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;now&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;datetime&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;now&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;year_month&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;now&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;strftime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;%Y-%m&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;target_path&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;{year_month}/{filename}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;url&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;https://api.github.com/repos/{repo}/contents/{target_path}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;headers&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;s2&#34;&gt;&amp;#34;Authorization&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;token {token}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;s2&#34;&gt;&amp;#34;Accept&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;application/vnd.github.v3+json&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;s2&#34;&gt;&amp;#34;User-Agent&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Python-urllib&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;s2&#34;&gt;&amp;#34;message&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;Add {filename}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;s2&#34;&gt;&amp;#34;content&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;base64&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;b64encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;content&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;s2&#34;&gt;&amp;#34;branch&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;branch&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;current_sha&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;get_file_sha&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;repo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;token&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;branch&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;target_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;c1&#34;&gt;# 如果文件不存在，current_sha 可能为 None，需要根据业务逻辑处理&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;c1&#34;&gt;# 例如，可以决定创建一个新文件而不是更新一个不存在的文件&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;current_sha&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;sha&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;current_sha&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;req&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;data&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;json&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;dumps&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;data&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;encode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;headers&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;headers&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;method&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;PUT&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;with&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;urlopen&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;req&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;rs&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;json&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;loads&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;utf-8&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;file_url&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;rs&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;content&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;][&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;download_url&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;n&#34;&gt;cdn_url&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;https://cdn.jsdelivr.net/gh/{repo}@{branch}/{target_path}&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;s1&#34;&gt;&amp;#39;file_url&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;file_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;s1&#34;&gt;&amp;#39;cdn_url&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cdn_url&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;s1&#34;&gt;&amp;#39;md_cdn&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;![{filename}]({cdn_url})&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;except&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;urllib&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;error&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;HTTPError&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;error_msg&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;read&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;decode&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;utf-8&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;raise&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;RuntimeError&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;GitHub API错误: {error_msg}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;except&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Exception&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;raise&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;RuntimeError&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;上传失败: {str(e)}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;():&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;parser&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;argparse&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ArgumentParser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;description&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;GitHub图片上传工具&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;parser&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;add_argument&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;image_path&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;help&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;要上传的图片路径(本地路径或URL)&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;args&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;parser&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parse_args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;try&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;result&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;upload_file&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;image_path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;result&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;图片上传成功: {result[&amp;#39;content&amp;#39;][&amp;#39;html_url&amp;#39;]}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;except&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Exception&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;as&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;e&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nb&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;错误: {str(e)}&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;__name__&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;__main__&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;mcp&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;transport&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;stdio&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        <item>
         <title>构建指定cuda版本的vllm镜像</title>
         <link>https://blog.liu-nian.top/ai/%E6%9E%84%E5%BB%BA%E6%8C%87%E5%AE%9Acuda%E7%89%88%E6%9C%AC%E7%9A%84vllm%E9%95%9C%E5%83%8F/</link>
         <pubDate>Tue, 11 Mar 2025 08:38:25 +0000</pubDate>
@@ -1176,6 +1649,714 @@ Gradient values are computed during the backward pass of the model. They represe
 </description>
         </item>
         <item>
+        <title>基于APPBuildr的智能体实战案例-报销助手</title>
+        <link>https://blog.liu-nian.top/ai/%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B-%E6%8A%A5%E9%94%80%E5%8A%A9%E6%89%8B/</link>
+        <pubDate>Sun, 01 Dec 2024 17:29:32 +0800</pubDate>
+        
+        <guid>https://blog.liu-nian.top/ai/%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B-%E6%8A%A5%E9%94%80%E5%8A%A9%E6%89%8B/</guid>
+        <description>&lt;h2 id=&#34;发票合规验证助手&#34;&gt;发票合规验证助手
+&lt;/h2&gt;&lt;h3 id=&#34;11-背景&#34;&gt;1.1 背景：
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;    发票报销是每个公司员工常见的工作之一。一般公司的报销制度都有比较复杂的规定和流程。员工在报销时没注意到销制度的一些细节，便容易出现所报销的发票不符合公司的规定的情况，导致了许多额外的工作量。同时很多公司采用纸质发票或者电子发票打印的方式进行报销，在报销审核流程上也要耗费很多的时间。
+
+    发票合规验证助手智能体用于解决以上问题。利用大模型调用文本识别接口，自动识别电子发票，方便线上审核。根据发票信息，大模型查询公司的报销制度手册，判断发票是否满足公司的报销规范，并告知用户。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;12-方案设计&#34;&gt;1.2 方案设计
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/6c1a0fa6ae93e5dbca8a35f3d4e9f972c8166f03fe88943c113eea521f948c72.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 0&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;13--prompt编写&#34;&gt;1.3  Prompt编写
+&lt;/h3&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/assistant/a694c560-b3b9-4bc4-b6ae-95a4ca317174/831cec36-e8e1-464f-b802-38ea6dbc45b6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/assistant/a694c560-b3b9-4bc4-b6ae-95a4ca317174/831cec36-e8e1-464f-b802-38ea6dbc45b6&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;44
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;45
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;46
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;47
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;48
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;49
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;50
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;51
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;52
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;53
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;54
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;55
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;56
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;57
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;58
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;59
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;60
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;61
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;62
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;63
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;64
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;65
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;66
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;67
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;68
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;69
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;70
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;71
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;72
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;73
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;74
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;75
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;76
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;77
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;78
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;79
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;80
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;81
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;82
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;83
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;84
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;85
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;86
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;87
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;88
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;89
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;90
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;91
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;92
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;93
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 角色
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;你是一位公司的财务人员，负责公司的报销制度制定与员工报销，以及回答员工问题。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 工具能力
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;使用通用文字识别技术，特别是高精度版，以准确识别并解析发票上的文字信息。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;利用知识库中的员工报销手册来判断发票的识别结果是否合规。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 要求与限制
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;根据数据源的报销制度，验证发票是否可用于报销
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;确保识别的准确性，以避免任何因识别错误导致的验证失败。重点识别发票的关键信息，如日期、金额、商品或服务描述等。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;请如实根据知识库与实际情况作答，不要假设场景。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 接受用户发票图片，系统使用通用文字识别技术解析并验证发票上的关键信息
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 根据发票解析结果，根据员工报销手册，判断发票是否可报销
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出规范
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;如果发票可用，则输出：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：输出是
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;如果发票不可用，则输出：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：否
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;不可用原因：说明不能用的原因
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 示例1
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;发票可用的示例：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：是
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;发票不可用示例：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：否
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;不可用原因：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 报销金额超限
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 发票抬头公司不符
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 数据源
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;员工报销手册
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;前言
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;本手册旨在明确百度在线网络技术(北京)有限公司（以下简称“公司”）员工在移动通讯费、工作交通费、交通费、业务洽谈费等方面的报销制度及流程，确保报销工作的规范化、透明化。请各位员工仔细阅读，并严格按照手册规定执行报销事宜。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;第一章 总则
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;目的与原则
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;本手册的制定旨在规范员工报销行为，提高报销效率，确保公司财务的合规性与准确性。报销应遵循“实事求是、合理合规、及时准确”的原则。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;适用范围
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;本手册适用于公司全体员工，包括但不限于全职员工、兼职员工、实习生等。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销流程
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;员工需先垫付相关费用，并保留好原始发票、收据等凭证。然后，通过公司报销系统提交报销申请，附上相关凭证及说明。经部门主管审核、财务部门复核后，方可进行报销。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;第二章 报销类型及限额
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;一、移动通讯费
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销范围
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;移动通讯费包括手机话费、上网流量费等因工作需要产生的通讯费用。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销限额
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;每月移动通讯费报销限额为人民币200元。超出部分需员工自行承担。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;开票要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;发票抬头需为“百度在线网络技术(北京)有限公司”。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;二、工作交通费
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销范围
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;工作交通费包括因工作需要而产生的出租车费、地铁费、公交费等公共交通费用。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销条件
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;工作交通费只允许报销晚上10点后至早上7点前、以及周末节假日全天所发生的费用。其他时间段产生的费用不予报销。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销限额
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;每月工作交通费报销限额为人民币500元。超出部分需员工自行承担。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;开票要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;发票抬头需为“百度在线网络技术(北京)有限公司”。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;三、交通费
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销范围
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;交通费包括因工作需要而产生的长途汽车费、火车票、飞机票等费用。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销限额
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;交通费报销需根据出差地点、出差天数等因素综合考虑，具体限额如下：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;市内短途出差：每次不超过人民币100元；
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;省内长途出差：每次不超过人民币500元；
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;跨省长途出差：根据出差地点及交通工具类型，每次不超过人民币2000元。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;超出限额部分需员工自行承担，并需提前向部门主管申请并获得批准。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;开票要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;发票抬头需为“百度在线网络技术(北京)有限公司”。同时，需附上出差申请单、行程单等相关凭证。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;四、业务洽谈费
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销范围
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;业务洽谈费为与客户吃饭产生的餐费，旨在促进业务合作与交流。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销限额
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;每次业务洽谈费报销限额为人民币1000元。超出部分需员工自行承担，并需提前向部门主管申请并获得批准。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;开票要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;发票抬头需为“百度在线网络技术(北京)有限公司”。同时，需附上业务洽谈邀请函、客户名单、菜单等相关凭证。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;第三章 报销限制条件
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;费用日期限制
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;费用日期超过3个月以上不允许报销。请员工务必在费用发生后及时提交报销申请。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;报销凭证要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;员工需保留好原始发票、收据等凭证，并确保凭证的真实性与完整性。无凭证或凭证不全者，不予报销。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;特殊事项处理
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;对于因特殊原因产生的费用（如紧急出差、突发事件等），员工需提前向部门主管申请并获得批准。未经批准而产生的费用，不予报销。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;第四章 报销审核与支付
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;审核流程
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;员工提交报销申请后，由部门主管进行初审。初审通过后，由财务部门进行复核。复核通过后，方可进行报销支付。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;支付方式
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;公司采用银行转账方式支付报销款项。员工需在报销系统中填写正确的银行账户信息。因信息错误而导致的支付失败或延误，由员工自行承担。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;支付时效
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;财务部门在收到完整的报销申请及凭证后，将在5个工作日内完成审核并支付报销款项。如遇特殊情况需延迟支付，财务部门将提前通知员工并说明原因。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;14-prompt优化策略&#34;&gt;1.4 Prompt优化策略
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;基于思维连策略细化任务内容&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;在判断是否满足员工报销制度要求时，为了方便大模型判断的准确性，使用Cot方式将处理过程进行拆解。任务部分的Prompt修改如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;首先尝试回答以下问题：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 发票中的购买方（开票抬头公司）是谁？销售方是谁？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 发票中消费或购买的是什么服务？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 发票中的消费金额是多少？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4. 发票的开票日期是多少？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;基于上一步的判断，根据员工报销制度手册，回答以下问题：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 根据发票信息，将该发票划分为公司报销类型中的一种，并说明是哪一种？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 今天是哪天，开票日期距今多久，是否在公司许可时效范围内？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 开票金额是否在公司需要范围内？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4. 购买方公司名称是什么？是否满足公司发票抬头要求？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;根据对以上问题的回答和理解，判断该发票是否可用于报销
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;使用知识库来存储员工手册&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;使用外部知识库的方式可以更好地对员工手册进行切片，增强大模型的检索和理解能力。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/51279b0329bdc12940150822e1d55464e0385e79c33ed40a81d056bd647d3ff8.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 2&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/344ed8d3b98f64fa1d9614e909506cc43af5e57faaefdb8c22245edf43b88402.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 3&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;15-最终prompt与效果展示&#34;&gt;1.5 最终Prompt与效果展示
+&lt;/h3&gt;&lt;p&gt;最终的Prompt如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 角色
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;你是一位公司的财务人员，负责公司的报销制度制定与员工报销，以及回答员工问题。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 工具能力
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;使用通用文字识别技术，特别是高精度版，以准确识别并解析发票上的文字信息。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;利用知识库中的员工报销手册来判断发票的识别结果是否合规。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 要求与限制
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;根据知识库的报销制度，验证发票是否可用于报销
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;确保识别的准确性，以避免任何因识别错误导致的验证失败。重点识别发票的关键信息，如日期、金额、商品或服务描述等。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;请如实根据知识库与实际情况作答，不要假设场景。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;首先尝试回答以下问题：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 发票中的购买方（开票抬头公司）是谁？销售方是谁？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 发票中消费或购买的是什么服务？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 发票中的消费金额是多少？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4. 发票的开票日期是多少？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;基于上一步的判断，根据知识库中的员工报销制度手册，回答以下问题：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 根据发票信息和员工报销手册，将该发票划分为公司报销类型中的一种，并说明是哪一种？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 今天是哪天，开票日期距今多久，是否在公司许可时效范围内？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 开票金额是否在公司需要范围内？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4. 购买方公司名称是什么？是否满足公司发票抬头要求？
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;根据对以上问题的回答和理解，判断该发票是否可用于报销
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出规范
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;如果发票可用，则输出：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：输出是或者否
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;如果发票不可用，则输出：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：否
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;不可用原因：说明不能用的原因
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#  示例1 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：是
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 示例 2
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;该发票是否可用：否
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;不可用原因：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 报销金额超限
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 发票抬头公司不符
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在APPBuilder中的设置效果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/bda86ede9c33d57ec1a7f58a0d19deaf7dd173e9bc9308a97f21282822664406.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 5&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/d2c79ee616264d31de79ea78b4b0c537ef6e171fe949ffe9038f593904b61063.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 6&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;智能报销智能体&#34;&gt;智能报销智能体
+&lt;/h2&gt;&lt;h3 id=&#34;21-背景&#34;&gt;2.1 背景
+&lt;/h3&gt;&lt;p&gt;上一个案例仅仅使用智能体实现了一个发票的合规性检查工作。实际上我们还可以做得更多。基于以上的验证结果，我们还可以进行如下的工作：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;调用外部的api，对发票的真实性进行验证；&lt;/li&gt;
+&lt;li&gt;抽取信息形成报销表单并对接到公司的审批流中；&lt;/li&gt;
+&lt;li&gt;同时我们也可以利用智能体的记忆功能保存员工手册中的知识、报销单据，并进行询问和统计；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;22-方案设计&#34;&gt;2.2 方案设计
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/5bea042046e2361d30f882bb878e215164618e1c7c936c5f3697371f36cdb915.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 7&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/chatflow/1832bf3c-d051-490b-bc64-70c91e404214/27702d2a-038e-468d-98f3-b217d4258e31&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/chatflow/1832bf3c-d051-490b-bc64-70c91e404214/27702d2a-038e-468d-98f3-b217d4258e31&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;23-prompt编写&#34;&gt;2.3 Prompt编写
+&lt;/h3&gt;&lt;p&gt;我们需要再在这个项目中单独创建几个单独的部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;发票识别组件&lt;/li&gt;
+&lt;li&gt;发票信息合规判断&lt;/li&gt;
+&lt;li&gt;发票验真组件&lt;/li&gt;
+&lt;li&gt;串联工作流和组件的Prompt和代码&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;231-发票识别组件&#34;&gt;2.3.1 发票识别组件
+&lt;/h4&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.bce.baidu.com/ai_apaas/workflow/cfe5049f-f9db-4669-b7fa-e1a2e402fe6e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://console.bce.baidu.com/ai_apaas/workflow/cfe5049f-f9db-4669-b7fa-e1a2e402fe6e&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;其中发票识别组件使用外部API接入的方式创建。如下图展示的发票识别组件在输入层了数据转换以方便获取图片的url地址。同样，在输出层也做了一层转换，以方便外部其他组件的调用时，可以直接获区拼装好的文字内容。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/ac213c76c707c7467e1e035c3a0f2a5614c4eb6d8b3e10a5856d626a2a62923a.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 8&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;232-发票信息合规判断组件&#34;&gt;2.3.2 发票信息合规判断组件
+&lt;/h4&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.bce.baidu.com/ai_apaas/workflow/bd8c8e51-5b8f-4819-a517-8b7fcd0d8cc7&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://console.bce.baidu.com/ai_apaas/workflow/bd8c8e51-5b8f-4819-a517-8b7fcd0d8cc7&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;发票信息合规判断组件以query改写、知识库组件、发票类型判断和合规判断四部分为核心。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/d220d5ba3ef42916afba203802f8f4fc6349528cee560758c97a78b3daa2033e.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 9&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 角色
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;你是一位公司的财务人员，帮助员工回答报销问题
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;基于{{content}}，来回答{{query}}，以json格式输出结果
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;输出格式：json
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;输出字段以及含义如下：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bx_type：公司报销类型中最有可能报销类型
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;xz_reason：选择这种报销类型的原因
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出示例
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{ 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;bx_type&amp;#34;:&amp;#34;业务洽谈费&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;xz_reason&amp;#34;:&amp;#34;该发票属于餐饮费，可用于公司业务洽谈费的报销范围&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 角色
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;你是一位公司的财务人员，负责公司的报销制度制定与员工报销，以及回答员工问题。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;基于{{content}}，以及提交报销的日期为{{c_date}},来回答{{query}}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 特别注意
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;在判断发票是否可报销时要特别注意以今天为提交报销申请的时间节点，报销是否合规。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;输出字段以及含义
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;code：0或1。0表示满足公司报销合规要求或找到用户咨询的答案，1表示不满足公司报销规定或没有找到用户合适的答案。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;reason：满足或不满足公司合规要求的原因，或是用户问题的答案。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出示例
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{ 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;code&amp;#34;:0,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;reason&amp;#34;:&amp;#34;发票的金额、抬头、报销日期均符合报销要求&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;知识库生成Prompt:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#角色：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;你是一名公司的财务人员，主要负责处理员工的报销制度编制和员工报销事宜。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#任务：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 编制一份员工报销手册，主要包括移动通讯费、工作交通费、交通费、业务洽谈费几种类型的报销。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 对报销添加限制条件，包括但不限于：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.1 每种报销的限额以及月总费用的限额；
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.2 费用日期超过3个月以上不允许报销
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.3 工作交通费只允许报销晚上10点后至早上7点前、以及周末节假日全天所发生的费用
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.4 业务洽谈费为与客户吃饭产生的餐费
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2.5 每种费用的开票抬头公司为：百度在线网络技术(北京)有限公司
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 本手册内容不少于2000字
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#输出要求：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;手册通俗易通，结构清晰，无歧义。
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;[附件]&lt;/p&gt;
+&lt;h4 id=&#34;233-发票验真组件&#34;&gt;2.3.3 发票验真组件
+&lt;/h4&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://console.bce.baidu.com/ai_apaas/workflow/d0e9467e-b1fc-4ee8-bf8f-a09706d9a0a6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://console.bce.baidu.com/ai_apaas/workflow/d0e9467e-b1fc-4ee8-bf8f-a09706d9a0a6&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;发票验真API准备&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这里生成一个模拟发票验证的接口，生成接口的Prompt如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#角色
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;你是一名python研发工程师
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#任务
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;基于python3，使用flask框架生成一个发票验证接口，尽可能少的使用第三方框架。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;具体要求如下：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 接口为post请求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 入参接受json格式，具体参数如下：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;nomber:发票号
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;pay:购买方
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sale:销售方
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;date:开票日期
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;account:发票金额
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 返回参数：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;code:0表示验证成功，1表示验证失败
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;msg:验证结果，主要是success和fail，分别对应code的0和1两种结果
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;4. 处理逻辑
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;以80%的概率返回成功，20%的概率返回失败。
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;# 输出要求
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;1. 所有代码在一个文件中。每个函数需要有详细的注释
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;2. 输入和输出都为json格式
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;3. 生成一个requrements.txt文件，包含所有依赖的第三方框架
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;#样例：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;输入样例：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;nomber&amp;#34;:&amp;#34;24112000003220018474944&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;pay&amp;#34;:&amp;#34;xxxx有限公司&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;sale&amp;#34;:&amp;#34;北京恒泰人合火锅店&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;date&amp;#34;:&amp;#34;2024年04月03日&amp;#34;,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;account&amp;#34;:&amp;#34;246.23&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;输出样例：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;code&amp;#34;:0,
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;#34;msg&amp;#34;:&amp;#34;success&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;代码文件：&lt;/p&gt;
+&lt;p&gt;[附件]
+用于构建、发布服务的镜像Dockerfile如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;from python:3.10.0-slim-buster
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;run pip install flask  &amp;amp;&amp;amp; mkdir -p /opt/fpyz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;copy app.py /opt/fpyz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;workdir /opt/fpyz
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cmd python /opt/fpyz/app.py
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;发票验真组件搭建&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/3e2a5537a26ee783df70860a51dd75319d6db46e0c278f673449728319158ab4.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 10&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;组件调试
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/b062edfe35c1485f0c77f5eb609cdf54608c6661cce6fa8b6e4ee29eed1d29a0.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 11&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;24-整体智能体工作流如下&#34;&gt;2.4 整体智能体工作流如下：
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/d47ada3cc51f35c2cec51847d8f8063cc410f567a69d85231d816502aa450a08.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 12&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;2.5 智能体优化策略&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;添加记忆变量，优化不同组件之间的变量传递&lt;/li&gt;
+&lt;li&gt;对接外部接口或数据库，方便查询报销单的处理流程&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;&#34;&gt;
+&lt;/h3&gt;</description>
+        </item>
+        <item>
         <title>llama.cpp推理-树莓派4b</title>
         <link>https://blog.liu-nian.top/ai/llama.cpp/</link>
         <pubDate>Wed, 25 Sep 2024 08:38:25 +0000</pubDate>
@@ -1269,7 +2450,7 @@ Gradient values are computed during the backward pass of the model. They represe
 </description>
         </item>
         <item>
-        <title>lvllm-cpu推理-以qwen2-0.5b为例</title>
+        <title>vllm-cpu推理-以qwen2-0.5b为例</title>
         <link>https://blog.liu-nian.top/ai/vllm-cpu%E6%8E%A8%E7%90%86-%E4%BB%A5qwen2-0.5b%E4%B8%BA%E4%BE%8B/</link>
         <pubDate>Mon, 23 Sep 2024 08:38:25 +0000</pubDate>
         
@@ -3689,11 +4870,750 @@ WKT是用来单独表示空间点、线、面数据，GeoJSON还可以用来表�
 &lt;/div&gt;</description>
         </item>
         <item>
+        <title>机器学习概述</title>
+        <link>https://blog.liu-nian.top/ai/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%BF%B0/</link>
+        <pubDate>Fri, 11 Mar 2022 08:38:25 +0000</pubDate>
+        
+        <guid>https://blog.liu-nian.top/ai/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%BF%B0/</guid>
+        <description>&lt;h2 id=&#34;ai-vs-ml-vs-dl&#34;&gt;AI vs ML vs DL
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/897d9646c757b136ff990192e22bb739520ca94432c696d803782cc2b8f8ec59.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 0&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;ai人工智能&#34;&gt;AI:人工智能
+&lt;/h3&gt;&lt;p&gt;人工智能是在1956年达特茅斯会议上首先提出的。该会议确定了人工智能的目标是“实现能够像人类一样利用知识去解决问题的机器”。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/26198bdcc8778c7de76b9a0e59c7679e2de47c6a38b3b4bec1009f2ac359683e.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 2&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;像人一样思考：认知科学&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;像人一样行动：图灵测试（1950）的途径&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自然语言处理&lt;/li&gt;
+&lt;li&gt;知识表示&lt;/li&gt;
+&lt;li&gt;自动推理&lt;/li&gt;
+&lt;li&gt;机器学习&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;完全图灵测试：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;计算视觉&lt;/li&gt;
+&lt;li&gt;机器人学&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;合理地思考：逻辑学&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;合理地行动：强化学习&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;机器学习&#34;&gt;机器学习
+&lt;/h3&gt;&lt;h4 id=&#34;学习的定义&#34;&gt;&lt;strong&gt;学习的定义：&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;Herbert A. Simon&lt;/strong&gt;：如果一个系统能够通过执行某个过程改进他的性能，这就是学习。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Tom M. Mitchell&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;Study of algorithms that&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;improve their performance P&lt;/li&gt;
+&lt;li&gt;at some task T&lt;/li&gt;
+&lt;li&gt;withexperience E&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;well-defined learning task: &amp;lt;P,T,E&amp;gt;
+一个程序被认为能从经验E中学习，解决任务 T，达到性能度量值P，当且仅当，有了经验E后，经过P评判， 程序在处理 T 时的性能有所提升。&lt;/p&gt;
+&lt;h4 id=&#34;机器学习从原始数据中获取模式规律&#34;&gt;**机器学习：**从原始数据中获取模式(规律)
+&lt;/h4&gt;&lt;h3 id=&#34;深度学习&#34;&gt;深度学习
+&lt;/h3&gt;&lt;h4 id=&#34;表示学习自动地学习出有效特征-并最终提升机器学习模型性能的方法&#34;&gt;&lt;strong&gt;表示学习：自动地学习出有效特征, 并最终提升机器学习模型性能的方法。&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;局部学习：0ne-hot编码&lt;/p&gt;
+&lt;p&gt;分布表示：连续表示（RGB）、词向量（词嵌入）&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;特征工程 VS 表示学习：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;特征工程：人工提取特征&lt;/p&gt;
+&lt;p&gt;表示学习：自动获取特征&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/7385337daee976167ce163f3170f5b24de4c153d0fe40fe11ec92f8e5f6641f4.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 3&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;深度学习-1&#34;&gt;&lt;strong&gt;深度学习：&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/761c6321d9a63dc9b1b69f042d179397792d0ee206a3cb9abea9c9dd002bf560.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 4&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;统计学-vs-统计学习-vs-机器学习&#34;&gt;统计学 vs 统计学习 vs 机器学习
+&lt;/h2&gt;&lt;p&gt;参考文献：&lt;a class=&#34;link&#34; href=&#34;http://brenocon.com/blog/2008/12/statistics-vs-machine-learning-fight/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://brenocon.com/blog/2008/12/statistics-vs-machine-learning-fight/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;统计学 ：Statistics&lt;/p&gt;
+&lt;p&gt;统计学习：Statistical learning&lt;/p&gt;
+&lt;p&gt;统计机器学习:Statistical machine learning&lt;/p&gt;
+&lt;p&gt;机器学习：Machine Learning&lt;/p&gt;
+&lt;h2 id=&#34;机器学习-vs-数据挖掘&#34;&gt;机器学习 vs 数据挖掘
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/aa4c9c57a50a57862d1795d104c293eb125e1c631de1b7d64232122b93a7d116.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 5&#34;
+	
+	
+&gt;
+&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/ea0c88b3085e4c8a6dafb13bbdf84639f74e2e74b2ae4ae9bcc4e41530a0710d.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 7&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;•机器学习是数据挖掘的重要工具。&lt;/p&gt;
+&lt;p&gt;•数据挖掘不仅仅要研究、拓展、应用一些机器学习方法，还要通过许多非机器学习技术解决数据仓储、大规模数据、数据噪音等等更为实际的问题。&lt;/p&gt;
+&lt;p&gt;•机器学习的涉及面更宽，常用在数据挖掘上的方法通常只是“从数据学习”，然则机器学习不仅仅可以用在数据挖掘上，一些机器学习的子领域甚至与数据挖掘关系不大，例如增强学习与自动控制等等。&lt;/p&gt;
+&lt;p&gt;•数据挖掘试图从海量数据中找出有用的知识。&lt;/p&gt;
+&lt;p&gt;•大体上看，数据挖掘可以视为机器学习和数据库的交叉，它主要利用&lt;strong&gt;机器学习界提供的技术来分析海量数据，利用数据库界提供的技术来管理海量数据&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;冯诺依曼机的现代观点ai-vs-大数据-vs-云计算&#34;&gt;冯诺依曼机的现代观点：AI vs 大数据 vs 云计算
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://baike.baidu.com/item/3D%E7%A3%81%E5%AD%98%E5%82%A8%E5%99%A8/22383847&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://baike.baidu.com/item/3D%E7%A3%81%E5%AD%98%E5%82%A8%E5%99%A8/22383847&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/9ba3c288f42d7c16305b0d4c4f0d0727f3d3c383f1c75758d211d09b2d022437.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 8&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;机器学习的三要素&#34;&gt;机器学习的三要素
+&lt;/h2&gt;&lt;p&gt;机器学习=模型+策略+算法(优化算法)&lt;/p&gt;
+&lt;p&gt;[附件]&lt;/p&gt;
+&lt;h3 id=&#34;模型决策函数概率模型&#34;&gt;模型:决策函数、概率模型
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;在监督学习中，模型就是所要学习的条件概率分布或决策函数。&lt;/li&gt;
+&lt;li&gt;模型的假设空间F 包含所有可能的条件概率分布或决策函数。&lt;/li&gt;
+&lt;li&gt;假设空间可以是决策函数的集合&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+F = {f |Y = f_\theta(X),\theta\in R^n
+$$&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;也可以是条件概率函数的集合&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+F = {F | P_\theta(Y|X),\theta\in R^n
+$$&lt;/p&gt;
+&lt;p&gt;简单理解：&lt;/p&gt;
+&lt;p&gt;$Y= aX^2 +bX + c$&lt;/p&gt;
+&lt;h3 id=&#34;策略选择模型的准则&#34;&gt;策略:选择模型的准则
+&lt;/h3&gt;&lt;p&gt;资源：&lt;a class=&#34;link&#34; href=&#34;https://mp.weixin.qq.com/s/LN1X4TVgfF-FRhMlqEUVpw&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://mp.weixin.qq.com/s/LN1X4TVgfF-FRhMlqEUVpw&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;损失函数一次预测的好坏&#34;&gt;损失函数：一次预测的好坏
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;0-1损失函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+L(Y,f(X)) = \begin{cases}
+1 &amp;amp;Y=f(X) \
+0 &amp;amp;Y{=}\mathllap{/,} f(X)
+\end{cases}
+$$&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;平方损失函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+L(Y,f(X)) = (Y-f(X))^2
+$$&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;绝对损失函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+L(Y,f(X)) = |Y-f(X)|
+$$&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对数损失函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;$$
+L(Y,f(X)) = -logP(Y|X)
+$$&lt;/p&gt;
+&lt;h4 id=&#34;风险函数平均意义下模型预测的好坏&#34;&gt;风险函数：平均意义下模型预测的好坏
+&lt;/h4&gt;&lt;p&gt;经验风险最小化最优模型&lt;/p&gt;
+&lt;p&gt;$$
+min_{\substack{f\in F}}\frac{1}{N}\sum_{i=1}L(y_i,f(x_i))
+$$&lt;/p&gt;
+&lt;h3 id=&#34;算法学习模型的具体算法&#34;&gt;算法:学习模型的具体算法
+&lt;/h3&gt;&lt;p&gt;–解析解
+–无解析解:数值计算&lt;/p&gt;
+&lt;p&gt;参考链接：&lt;a class=&#34;link&#34; href=&#34;https://zh.d2l.ai/chapter_optimization/index.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zh.d2l.ai/chapter_optimization/index.html&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;梯度下降&#34;&gt;梯度下降
+&lt;/h4&gt;&lt;p&gt;梯度下降法的计算过程就是沿梯度下降的方向求解极小值，也可以沿梯度上升方向求解最大值。&lt;/p&gt;
+&lt;p&gt;$$
+x \leftarrow x - \eta f&amp;rsquo;(x)
+$$&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;学习率&lt;/em&gt;（learning rate）决定目标函数能否收敛到局部最小值，以及何时收敛到最小值&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/66ca12add5b1d6ea6c9d222902378312a28b83ebdb50241cb66de87833e05063.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 9&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;批量梯度下降：每进行1次参数更新，需要计算&lt;strong&gt;整个数据样本集&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;随机梯度下降：随机均匀选择一部分样本做梯度下降&lt;/li&gt;
+&lt;li&gt;小批量梯度下降法：随机选择一批样本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;动量优化法&#34;&gt;动量优化法
+&lt;/h4&gt;&lt;p&gt;动量优化方法引入物理学中的动量思想，&lt;strong&gt;加速梯度下降&lt;/strong&gt;，有Momentum和Nesterov两种算法。当我们将一个小球从山上滚下来，没有阻力时，它的动量会越来越大，但是如果遇到了阻力，速度就会变小，动量优化法就是借鉴此思想，使得梯度方向在不变的维度上，参数更新变快，梯度有所改变时，更新参数变慢，这样就能够加快收敛并且减少动荡。&lt;/p&gt;
+&lt;p&gt;$$
+V_t \leftarrow \beta V_{t-1} + g_{t,t-1}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+X_t \leftarrow x_{t-1}  -  \eta_t V_t
+$$&lt;/p&gt;
+&lt;h4 id=&#34;自适应学习率优化算法&#34;&gt;自适应学习率优化算法
+&lt;/h4&gt;&lt;p&gt;在机器学习中，学习率是一个非常重要的超参数，但是学习率是非常难确定的，虽然可以通过多次训练来确定合适的学习率，但是一般也不太确定多少次训练能够得到最优的学习率，玄学事件，对人为的经验要求比较高，所以是否存在一些策略自适应地调节学习率的大小，从而提高训练速度。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AdaGrad&lt;/li&gt;
+&lt;li&gt;RMSprop&lt;/li&gt;
+&lt;li&gt;Adadelta&lt;/li&gt;
+&lt;li&gt;Adam：Adaptive Moment Estimation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;机器学习的分类&#34;&gt;机器学习的分类
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/9246a10ffd5365e0d64f88c198b06a70e90866f7a8932985c16f5fc0b5824a97.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;picture 10&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;模型选择正则化交叉验证&#34;&gt;模型选择：正则化、交叉验证
+&lt;/h2&gt;&lt;p&gt;选择模型的方法主要包括正则化、交叉验证&lt;/p&gt;
+&lt;h3 id=&#34;正则化在经验风险上加一个正则化项regularizer或罚项penalty-term&#34;&gt;正则化：在经验风险上加一个正则化项(Regularizer)或罚项(Penalty term)。
+&lt;/h3&gt;&lt;p&gt;一般形式：&lt;/p&gt;
+&lt;p&gt;$$
+min_{\substack{f\in F}}\frac{1}{N}\sum_{i=1}L(y_i,f(x_i)) + \lambda J(f)
+$$&lt;/p&gt;
+&lt;p&gt;二阶形式：&lt;/p&gt;
+&lt;p&gt;$$
+min_{\substack{f\in F}}\frac{1}{N}\sum_{i=1}L(y_i,f(x_i)) + \lambda||w||
+$$&lt;/p&gt;
+&lt;p&gt;一阶形式：&lt;/p&gt;
+&lt;p&gt;$$
+min_{\substack{f\in F}}\frac{1}{N}\sum_{i=1}L(y_i,f(x_i)) + \lambda||w||
+$$&lt;/p&gt;
+&lt;h3 id=&#34;交叉验证将数据分为训练集验证集测试集&#34;&gt;交叉验证：将数据分为训练集、验证集、测试集
+&lt;/h3&gt;&lt;p&gt;简单交叉验证：训练集、测试集&lt;/p&gt;
+&lt;p&gt;S折交叉验证:S个互不相交的大小相同的子集，用S-1个子集训练模型&lt;/p&gt;
+&lt;p&gt;留一交叉验证:S=N&lt;/p&gt;
+&lt;h2 id=&#34;机器学习任务的一般流程&#34;&gt;机器学习任务的一般流程
+&lt;/h2&gt;&lt;h3 id=&#34;准备工作&#34;&gt;准备工作：
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;准备数据&lt;/li&gt;
+&lt;li&gt;框架问题-业务目标、解决方案&lt;/li&gt;
+&lt;li&gt;选择性能指标（均方差、交叉熵等）与评测方案&lt;/li&gt;
+&lt;li&gt;检验假设-与实际生产环境对齐&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;数据获取分析处理&#34;&gt;数据获取、分析、处理
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;获取数据&lt;/li&gt;
+&lt;li&gt;分析数据（可视化）&lt;/li&gt;
+&lt;li&gt;数据清洗&lt;/li&gt;
+&lt;li&gt;特征工程&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;模型训练&#34;&gt;模型训练
+&lt;/h3&gt;&lt;h3 id=&#34;模型测试评估&#34;&gt;模型测试、评估
+&lt;/h3&gt;&lt;h3 id=&#34;模型服务上架&#34;&gt;模型服务（上架）
+&lt;/h3&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/Williamyzd/pub-imgs/blob/main/2025-06/line_re.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;房价预测案例&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Archives</title>
         <link>https://blog.liu-nian.top/archives/</link>
         <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
         
         <guid>https://blog.liu-nian.top/archives/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title></title>
+        <link>https://blog.liu-nian.top/ai/%E7%90%86%E8%A7%A3transformer%E4%BB%8E0%E5%88%B01/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://blog.liu-nian.top/ai/%E7%90%86%E8%A7%A3transformer%E4%BB%8E0%E5%88%B01/</guid>
+        <description>&lt;h2 id=&#34;建议书籍&#34;&gt;&lt;strong&gt;建议书籍&lt;/strong&gt;：
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;实战书籍&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;《机器学习实战（原书第2版）》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;基于sklearn、Tesnsorflow&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://book.douban.com/subject/35218199/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://book.douban.com/subject/35218199/&lt;/a&gt;﻿&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;动手学深度学习》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;(书籍、代码、视频-沐神出品，可以关注沐神的知乎和b站，经常会发干货)&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://zh.d2l.ai/chapter_preface/index.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://zh.d2l.ai/chapter_preface/index.html&lt;/a&gt;﻿&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;漫画机器学&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://book.sciencereading.cn/shop/book/Booksimple/onlineRead.do?id=BBFFD36F5A94C6D7DE053010B0A0AB613000&amp;amp;readMark=0&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://book.sciencereading.cn/shop/book/Booksimple/onlineRead.do?id=BBFFD36F5A94C6D7DE053010B0A0AB613000&amp;amp;readMark=0&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;理论书籍&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;《机器学习》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;（西瓜书-周志华-比较通俗易懂）&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://book.douban.com/subject/26708119/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://book.douban.com/subject/26708119/&lt;/a&gt;﻿&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;《统计学习方法（第2版）》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;（大量公式-比较难啃，但是知识点非常全面，类似于知识清单）&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://book.douban.com/subject/33437381/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://book.douban.com/subject/33437381/&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;*《深度学习》&lt;/p&gt;
+&lt;p&gt;（花书-深度学习三巨头鸿篇巨制）&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://book.douban.com/subject/27087503/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://book.douban.com/subject/27087503/&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;NLP相关&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;《文本数据挖掘》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;nlp-领域大佬新做&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://book.douban.com/subject/34441323/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://book.douban.com/subject/34441323/&lt;/a&gt;﻿&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;《Speech and Language Processing (3rd ed. draft)》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;斯坦福大佬著作，不断更新中。中文译名，《自然语言处理综述》，对应版本为第二版。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://web.stanford.edu/~jurafsky/slp3/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://web.stanford.edu/~jurafsky/slp3/&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;参考资料：&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://llmbook-zh.github.io/LLMBook.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://llmbook-zh.github.io/LLMBook.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;标量向量张量&#34;&gt;标量、向量、张量
+&lt;/h2&gt;&lt;h3 id=&#34;标量-一个单独的数字&#34;&gt;&lt;strong&gt;&lt;strong&gt;标量：&lt;/strong&gt;&lt;/strong&gt; 一个单独的数字
+&lt;/h3&gt;&lt;h3 id=&#34;向量-一个向量是一列数词向量就是一列数字&#34;&gt;&lt;strong&gt;&lt;strong&gt;向量&lt;/strong&gt;&lt;/strong&gt; ：一个向量是一列数。词向量就是一列数字。
+&lt;/h3&gt;&lt;h3 id=&#34;张量&#34;&gt;&lt;strong&gt;&lt;strong&gt;张量：&lt;/strong&gt;&lt;/strong&gt;
+&lt;/h3&gt;&lt;h4 id=&#34;从视觉角度&#34;&gt;从视觉角度：
+&lt;/h4&gt;&lt;p&gt;一阶张量是一个一维数组，即一组数，我们可以将一组数表示为一个矢量&lt;/p&gt;
+&lt;p&gt;二阶张量是一个矩阵，因此我们可以将张量作为矢量和矩阵概念的推广。&lt;/p&gt;
+&lt;p&gt;三阶张量
+对于 RGB 图片，我们可以理解为由三张分别表示 R,G,B 分量的图片堆叠而成，如下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=849d6fd7beb94891863d86015a307582&amp;amp;docGuid=shKc-gyOcGMxHN&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对于每个分量图片，我们都可以看成一个矩阵，那么一张 RGB 图片就可以用三阶的张量进行表示。&lt;/p&gt;
+&lt;p&gt;四阶张量
+对于多张 RGB 图片，我们可以用四阶张量进行表示，可以看作是三阶张量（单张RGB图像）的数组（多张 RGB 图片）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=d1472cf3275c4f8889526b8d70619de4&amp;amp;docGuid=shKc-gyOcGMxHN&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;五阶张量
+视频是由多张图片组成的，因此每个视频可以用一个四阶张量表示，显然，多个视频可以用五阶张量表示。&lt;/p&gt;
+&lt;h4 id=&#34;从nlp角度&#34;&gt;从NLP角度：
+&lt;/h4&gt;&lt;p&gt;一阶张量一个字或词&lt;/p&gt;
+&lt;p&gt;二阶张量是一句话。&lt;/p&gt;
+&lt;p&gt;三阶以上的张量：一段话或者一篇文章，或者是将大量的语句分成若干个批次。&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;h2 id=&#34;分词与词向量&#34;&gt;分词与词向量
+&lt;/h2&gt;&lt;p&gt;参考链接：&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_63171455/article/details/142107937&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;AI大模型基础：1.分词_大模型分词-CSDN博客&lt;/a&gt;﻿&lt;/p&gt;
+&lt;h3 id=&#34;为什么要分词&#34;&gt;为什么要分词？
+&lt;/h3&gt;&lt;h4 id=&#34;自然语言类任务的流程中分词是重要一环&#34;&gt;自然语言类任务的流程中分词是重要一环
+&lt;/h4&gt;&lt;p&gt;分词是自然语言处理的基础，分词准确度直接决定了后面的词性标注、句法分析、词向量以及文本分析的质量。英文语句使用空格将单词进行分隔，除了某些特定词，如how many，New York等外，大部分情况下不需要考虑分词问题。但中文不同，天然缺少分隔符，需要读者自行分词和断句。故在做中文自然语言处理时，需要先进行分词。&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=35655eec53f24844aed43a9cecc39e21&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;分词就是将句子、段落、文章这种长文本，分解为以字词甚至更小单位的数据结构&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=01c4414d2b2d467794fa3d7ae321905d&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=838acce57b234215aba983f07f19e78a&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;中文分词难点&#34;&gt;中文分词难点
+&lt;/h4&gt;&lt;p&gt;中文分词不像英文那样，天然有空格作为分隔。而且中文词语组合繁多，分词很容易产生歧义。因此中文分词一直以来都是NLP的一个重点，也是一个难点。难点主要集中在分词标准，切分歧义和未登录词三部分。&lt;/p&gt;
+&lt;h3 id=&#34;中文分词算法&#34;&gt;中文分词算法
+&lt;/h3&gt;&lt;p&gt;传统的分词方法：&lt;/p&gt;
+&lt;p&gt;主要分为两类，基于词典的规则匹配方法，和基于统计的机器学习方法。&lt;/p&gt;
+&lt;h4 id=&#34;基于词典的分词算法&#34;&gt;基于词典的分词算法
+&lt;/h4&gt;&lt;p&gt;基于词典的分词算法，本质上就是字符串匹配。将待匹配的字符串基于一定的算法策略，和一个足够大的词典进行字符串匹配，如果匹配命中，则可以分词。根据不同的匹配策略，又分为正向最大匹配法，逆向最大匹配法，双向匹配分词，全切分路径选择等。&lt;/p&gt;
+&lt;p&gt;最大匹配法主要分为三种：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;正向最大匹配法&lt;/strong&gt;&lt;/strong&gt; ，从左到右对语句进行匹配，匹配的词越长越好。比如“商务处女干事”，划分为“商务处/女干事”，而不是“商务/处女/干事”。这种方式切分会有歧义问题出现，比如“结婚和尚未结婚的同事”，会被划分为“结婚/和尚/未/结婚/的/同事”。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;逆向最大匹配法&lt;/strong&gt;&lt;/strong&gt; ，从右到左对语句进行匹配，同样也是匹配的词越长越好。比如“他从东经过我家”，划分为“他/从/东/经过/我家”。这种方式同样也会有歧义问题，比如“他们昨日本应该回来”，会被划分为“他们/昨/日本/应该/回来”。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;双向匹配分词&lt;/strong&gt;&lt;/strong&gt; ，则同时采用正向最大匹配和逆向最大匹配，选择二者分词结果中词数较少者。但这种方式同样会产生歧义问题，比如“他将来上海”，会被划分为“他/将来/上海”。由此可见，词数少也不一定划分就正确。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;全切分路径选择&lt;/strong&gt;&lt;/strong&gt; ，将所有可能的切分结果全部列出来，从中选择最佳的切分路径。分为两种选择方法&lt;/p&gt;
+&lt;p&gt;n最短路径方法。将所有的切分结果组成有向无环图，切词结果作为节点，词和词之间的边赋予权重，找到权重和最小的路径即为最终结果。比如可以通过词频作为权重，找到一条总词频最大的路径即可认为是最佳路径。&lt;/p&gt;
+&lt;p&gt;n元语法模型。同样采用n最短路径，只不过路径构成时会考虑词的上下文关系。一元表示考虑词的前后一个词，二元则表示考虑词的前后两个词。然后根据语料库的统计结果，找到概率最大的路径。&lt;/p&gt;
+&lt;h4 id=&#34;子词分词&#34;&gt;子词分词
+&lt;/h4&gt;&lt;h5 id=&#34;bpe&#34;&gt;BPE:
+&lt;/h5&gt;&lt;p&gt;在 1994 年,BPE 算法被提出,最早用于通用的数据压缩 [137]。随后,自然  语言处理领域的研究人员将其进行适配,并应用于文本分词 [138]。BPE 算法从一  组基本符号(例如字母和边界字符)开始,迭代地寻找语料库中的两个相邻词元,  并将它们替换为新的词元,这一过程被称为合并。合并的选择标准是计算两个连  续词元的共现频率,也就是每次迭代中,最频繁出现的一对词元会被选择与合并。  合并过程将一直持续达到预定义的词表大小。&lt;/p&gt;
+&lt;p&gt;算法逻辑：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;准备足够大的训练语料&lt;/li&gt;
+&lt;li&gt;确定期望的subword词表大小&lt;/li&gt;
+&lt;li&gt;将单词拆分为字符序列并在末尾添加后缀“ &amp;lt;/ w&amp;gt;”，统计单词频率。 本阶段的subword的粒度是字符。 例如，“ low”的频率为5，那么我们将其改写为“ l o w &amp;lt;/ w&amp;gt;”：5&lt;/li&gt;
+&lt;li&gt;统计每一个连续字节对的出现频率，选择最高频者合并成新的subword&lt;/li&gt;
+&lt;li&gt;重复第4步直到达到第2步设定的subword词表大小或下一个最高频的字节对出现频率为1&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;停止符&amp;quot;&lt;code&gt;&amp;lt;/w&amp;gt;&lt;/code&gt;&amp;ldquo;的意义在于表示subword是词后缀。举例来说：&amp;ldquo;st&amp;quot;字词不加&amp;rdquo;&lt;code&gt;&amp;lt;/w&amp;gt;&lt;/code&gt;&amp;ldquo;可以出现在词首如&amp;quot;st ar&amp;rdquo;，加了&amp;rdquo;&lt;code&gt;&amp;lt;/w&amp;gt;&lt;/code&gt;&amp;ldquo;表明改字词位于词尾，如&amp;quot;wide st &lt;code&gt;&amp;lt;/w&amp;gt;&lt;/code&gt;&amp;quot;，二者意义截然不同。&lt;/p&gt;
+&lt;p&gt;每次合并后词表可能出现3种变化：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;+1，表明加入合并后的新字词，同时原来的2个子词还保留（2个字词不是完全同时连续出现）&lt;/li&gt;
+&lt;li&gt;+0，表明加入合并后的新字词，同时原来的2个子词中一个保留，一个被消解（一个字词完全随着另一个字词的出现而紧跟着出现）&lt;/li&gt;
+&lt;li&gt;-1，表明加入合并后的新字词，同时原来的2个子词都被消解（2个字词同时连续出现）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;实际上，随着合并的次数增加，词表大小通常先增加后减小。&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;论文地址：&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://aclanthology.org/P18-1007.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://aclanthology.org/P18-1007.pdf&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/86965595&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zhuanlan.zhihu.com/p/86965595&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;h5 id=&#34;wordpiece-&#34;&gt;WordPiece ：
+&lt;/h5&gt;&lt;p&gt;WordPiece 是谷歌内部非公开的分词算法,最初是由谷歌研究人员在开发语音  搜索系统时提出的 [140]。随后,在 2016 年被用于机器翻译系统 [141],并于 2018  年被 BERT 采用作为分词器 [13]。WordPiece 分词和 BPE 分词的想法非常相似,都  是通过迭代合并连续的词元,但是合并的选择标准略有不同。在合并前,WordPiece  分词算法会首先训练一个语言模型,并用这个语言模型对所有可能的词元对进行  评分。然后,在每次合并时,它都会选择使得训练数据的似然性增加最多的词元  对。  由于谷歌并未发布 WordPiece 分词算法的官方实现,这里我们参考了 Hugging  Face 在线自然语言课程中给出的 WordPiece 算法的一种实现。与 BPE 类似,WordPiece 分词算法也是从一个小的词汇表开始,其中包括模型使用的特殊词元和初始  词汇表。由于它是通过添加前缀(如 BERT 的##)来识别子词的,因此每个词的初  始拆分都是将前缀添加到词内的所有字符上。举例来说,“word”会被拆分为:“w  ##o ##r ##d”。与 BPE 方法的另一个不同点在于,WordPiece 分词算法并不选择最  频繁的词对,而是使用下面的公式为每个词对计算分数:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=ef9ab091017545d2b1be723df35449b3&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;unigram&#34;&gt;Unigram:
+&lt;/h5&gt;&lt;p&gt;BPE存在的问题：一个词可能有多个分法&lt;/p&gt;
+&lt;p&gt;与 BPE 分词和 WordPiece 分词不同,Unigram 分词方法 [142] 从语料库的一  组足够大的字符串或词元初始集合开始,迭代地删除其中的词元,直到达到预期  的词表大小。它假设从当前词表中删除某个词元,并计算训练语料的似然增加情  况,以此来作为选择标准。这个步骤是基于一个训练好的一元语言模型来进行的。  为估计一元语言模型,它采用期望最大化(Expectation–Maximization, EM)算法:  在每次迭代中,首先基于旧的语言模型找到当前最优的分词方式,然后重新估计  一元概率从而更新语言模型。这个过程中一般使用动态规划算法(即维特比算法,  Viterbi Algorithm)来高效地找到语言模型对词汇的最优分词方式。采用这种分词  方法的代表性模型包括 T5 和 mBART。&lt;/p&gt;
+&lt;p&gt;论文地址：&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://aclanthology.org/P16-1162.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://aclanthology.org/P16-1162.pdf&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_72947390/article/details/134821437&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;[UIM]论文解读：subword Regularization: Multiple Subword Candidates_unigram language model论文-CSDN博客&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;h5 id=&#34;byte-level-bpebbpe&#34;&gt;Byte-level BPE(BBPE)
+&lt;/h5&gt;&lt;p&gt;基础知识：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;Unicode：&lt;/strong&gt;&lt;/strong&gt; Unicode 是一种字符集，旨在涵盖地球上几乎所有的书写系统和字符。它为每个字符分配了一个唯一的代码点（code point）用于标识字符。Unicode 不关注字符在计算机内部的具体表示方式，而只是提供了一种字符到代码点的映射。Unicode 的出现解决了字符集的碎片化问题，使得不同的语言和字符能够在一个共同的标准下共存。然而，Unicode 并没有规定如何在&lt;a class=&#34;link&#34; href=&#34;https://zhida.zhihu.com/search?content_id=233133558&amp;amp;content_type=Article&amp;amp;match_order=1&amp;amp;q=%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%86%85%E5%AD%98&amp;amp;zhida_source=entity&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;计算机内存&lt;/a&gt;中存储和传输这些字符。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;UTF-8：&lt;/strong&gt;&lt;/strong&gt; UTF-8（Unicode Transformation Format-8）是一种变长的字符编码方案，它将 Unicode 中的代码点转换为字节序列。UTF-8 的一个重要特点是它是向后兼容 ASCII 的，这意味着标准的 ASCII 字符在 UTF-8 中使用相同的字节表示，从而确保现有的 ASCII 文本可以无缝地与 UTF-8 共存。在 UTF-8 编码中，字符的表示长度可以是1到4个字节，不同范围的 Unicode 代码点使用不同长度的字节序列表示，这样可以高效地表示整个 Unicode 字符集。UTF-8 的&lt;a class=&#34;link&#34; href=&#34;https://zhida.zhihu.com/search?content_id=233133558&amp;amp;content_type=Article&amp;amp;match_order=1&amp;amp;q=%E7%BC%96%E7%A0%81%E8%A7%84%E5%88%99&amp;amp;zhida_source=entity&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;编码规则&lt;/a&gt;是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单字节字符（ASCII 范围内的字符）使用一个字节表示，保持与 ASCII 编码的兼容性。&lt;/li&gt;
+&lt;li&gt;带有更高代码点的字符使用多个字节表示。UTF-8 使用特定的字节序列来指示一个字符所需的字节数，以及字符的实际数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;例如，英文字母 &amp;ldquo;A&amp;rdquo; 的 Unicode 代码点是U+0041，在 UTF-8 中表示为 0x41（与 ASCII 编码相同）；而中文汉字 &amp;ldquo;你&amp;rdquo; 的 Unicode 代码点是U+4F60，在 UTF-8 中表示为0xE4 0xBD 0xA0三个字节的序列。&lt;/p&gt;
+&lt;p&gt;所以简单的来说：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Unicode 是字符集，为每个字符分配唯一的代码点。&lt;/li&gt;
+&lt;li&gt;UTF-8 是一种基于 Unicode 的字符&lt;a class=&#34;link&#34; href=&#34;https://zhida.zhihu.com/search?content_id=233133558&amp;amp;content_type=Article&amp;amp;match_order=1&amp;amp;q=%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F&amp;amp;zhida_source=entity&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;编码方式&lt;/a&gt;，用于在计算机中存储和传输字符。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;Byte(字节)&lt;/strong&gt;&lt;/strong&gt; ：计算机存储和数据处理时，字节是最小的单位。一个字节包含8个(Bit)二进制位，每个位可以是0或1，每位的不同排列和组合可以表示不同的数据，所以一个字节能表示的范围是256个。&lt;/p&gt;
+&lt;p&gt;言归正传：&lt;/p&gt;
+&lt;p&gt;Byte-level BPE(BBPE)和Byte-Pair Encoding (BPE)区别就是BPE是最小词汇是字符级别，而BBPE是字节级别的，通过UTF-8的编码方式这一个字节的256的范围，理论上可以表示这个世界上的所有字符。&lt;/p&gt;
+&lt;p&gt;所以实现的步骤和BPE就是实现的粒度不一样，其他的都是一样的。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;初始词表：构建初始词表，包含一个字节的所有表示(256)。&lt;/li&gt;
+&lt;li&gt;构建频率统计：统计所有子词单元对（两个连续的子词）在文本中的出现频率。&lt;/li&gt;
+&lt;li&gt;合并频率最高的子词对：选择出现频率最高的子词对，将它们合并成一个新的子词单元，并更新词汇表。&lt;/li&gt;
+&lt;li&gt;重复合并步骤：不断重复步骤 2 和步骤 3，直到达到预定的词汇表大小、合并次数，或者直到不再有有意义的合并（即，进一步合并不会显著提高词汇表的效益）。&lt;/li&gt;
+&lt;li&gt;分词：使用最终得到的词汇表对文本进行分词。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;获取词向量&#34;&gt;获取词向量：
+&lt;/h3&gt;&lt;h4 id=&#34;独热表示onehotrepresentation&#34;&gt;独热表示（Onehotrepresentation）
+&lt;/h4&gt;&lt;p&gt;在自然语言处理的各项任务中，需要将字、词进行编码，形成数字表达的向量的形式，以便进行运算。常见的一种编码方式是独热表示（Onehotrepresentation）。这种编码方式是很多编码方式的基础。具体做法是首先有一个词汇表V，并按指定规则对词汇进行排序。定义一个向量用来表示词汇，向量大小同词汇表大小。词汇w的向量表示为c(w)，其在词汇表中的次序是i。c(w)的值第i位为1，其他位置是0。以‘我爱NLP’未例，具体表示如下：&lt;/p&gt;
+&lt;p&gt;w= ‘我‘，在词表中的次序是1；&lt;/p&gt;
+&lt;p&gt;c(w) =[0,1,0,0,…,0,0,0]；&lt;/p&gt;
+&lt;p&gt;W = ‘爱‘，在词表中的次序是3；&lt;/p&gt;
+&lt;p&gt;c(w) =[0,0,0,1,…,0,0,0]；&lt;/p&gt;
+&lt;p&gt;W = ‘NLP‘，在词表中的次序是2；&lt;/p&gt;
+&lt;p&gt;c(w)=[0,1,0,0,…,0,0,0]；&lt;/p&gt;
+&lt;p&gt;独热表示存在如下的问题：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;独热向量中的每一个位置都表示一个单词，但词汇之间没有相关性；&lt;/li&gt;
+&lt;li&gt;向量大小受词表的大小影响，词汇量大时便造成维数爆炸问题；&lt;/li&gt;
+&lt;li&gt;该词向量也无法表示未出现的词；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;分布表示distributedrepresentation&#34;&gt;分布表示（DistributedRepresentation）
+&lt;/h4&gt;&lt;p&gt;另外一种词汇的表示是Hinton提出的[49]分布表示（DistributedRepresentation）。主要做法是基于大量的文本数据学习，将语言中每个词汇对应到固定大小的向量。其长度一般远远小于词表大小。每个词汇可以再空间中映射成某一点，从而将距离概念引入词的表达，可以便捷地计算词汇之间在句法、语义上的相似性。&lt;/p&gt;
+&lt;p&gt;在文本的表示方面，主要有两种不同的表示方式：上下文无关的文本表示和上下文相关的文本表示。上下文无关的文本表示以Word2vec为代表，每个词映射成固定的词向量；上下文相关的文本表示以ELMO为发端，每个词汇表示为动态的词向量，根据上下文的不同，词向量不同。Word2vec不能解决一词多义的问题，而且存在词表之外词的表示问题（OOV）。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;strong&gt;NNLM时代&lt;/strong&gt;&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Word2Vec时代&lt;/li&gt;
+&lt;li&gt;ELMO-基于上下文的动态词向量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ELMO[55]是一种基于语境的词汇表达模型，不但可以解决一词多义的问题，而且可以挖掘出词汇的复杂特征，如词性特征、语法特征等。模型的核心思想是将句子来作为上下文，来训练词向量，学习当前上下文环境下的词汇表征。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;大模型时代的词向量，以Bert为开端&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;额外补充：目前中文词嵌入效果最好的模型之一：bge:&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://arxiv.org/pdf/2309.07597&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://arxiv.org/pdf/2309.07597&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://www.modelscope.cn/models/AI-ModelScope/bge-large-zh#usage&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.modelscope.cn/models/AI-ModelScope/bge-large-zh#usage&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;h2 id=&#34;需要掌握的神经网络结构rnnlstmseq2seq&#34;&gt;需要掌握的神经网络结构：RNN、LSTM、Seq2Seq
+&lt;/h2&gt;&lt;p&gt;大模型之前的NLP模型、算法都在尝试解决的问题：更好的表示输入，更好地利用知识（记忆）&lt;/p&gt;
+&lt;h3 id=&#34;rnn与bi-rnn&#34;&gt;RNN与Bi-RNN:
+&lt;/h3&gt;&lt;p&gt;NLP的某些任务如机器翻译、语音识别等都属于序列生成任务，每一时刻都输出都依赖与上一时刻以及之前的输出。RNN（RecurrentNeuralNetworks）是一种处理序列任务的神经网络[6]。&lt;/p&gt;
+&lt;p&gt;循环神经网络由数据获取层、数据流出层、隐藏层构成，与前馈神经网络相似。不同的是，RNN的隐藏层之间相互连接，使得RNN有了记忆之前输入内容的能力。隐藏层包含着之前每个时刻的信息，因此使得输出能够获得充分的信息。RNN的基本结构示意如图2.1：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=4c5ddbd9c6fd4811babe4bc6634d1d34&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在实际的应用中，只考虑输入的从左到右，并不能完全利用输入的信息。例如在文本摘要的任务重，某一时刻的输入不但与之前的输入信息有关，也与未输入的词汇有关。双向的神经网络从两个方向来考虑输入，能够对信息进行更充分的抽取和编码。其结构也比较简单，在原有的从左到右的隐藏层之上加上了一层从右到左的隐藏层，并将两者链接。双向神经网络可以获取两个方向的文本表示，增强了隐藏层的信息表达。图2.2是双向神经网络的示意图。ho层是从左到右的网络层，g0层是从由到左的网络层。这两层的信息拼接，作为下一层隐藏层的输入。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=124782cde67c495e8475e53c70d1969a&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;[流程图]### LSTM&lt;/p&gt;
+&lt;p&gt;RNN模型存在两个问题：长期依赖问题和梯度消失问题[45]。长期依赖问题是指RNN网络无法记忆较长的输入内容，只能记住最近的内容，这是链式求导数导致的问题[7]。长短期记忆模型与标准的循环神经网络的差别是体现在隐藏层。LSTM通过隐藏单元的门控机制来筛选信息，从而减弱了长期依赖和梯度小时问题。LSTM的门控主要包括输入门，遗忘门，输出门三部分，具体的计算如下&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=fecd58dbfa814bf58fa7bd32c4b220af&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=6ef8c9694d3f4f0b9c6976ee4ecd8503&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;序列到序列seq2seq&#34;&gt;序列到序列（Seq2Seq）
+&lt;/h3&gt;&lt;p&gt;DNN(深度神经网络，多层神经网络的叠加)是非常强大的机器学习工具，在自然语言处理的多个任务上取得了不错成绩。但是DNN只能处理输入和输出维度为固定的任务[34]。但是如翻译，摘要等任务的输出的长度是不定的，这类问题需要输入与输出是域无关的方案。这类的任务需要解决数据对齐的问题。序列到序列（SequencetoSequence）便是这样一套方案。&lt;/p&gt;
+&lt;p&gt;序列到序列结构的主要分为两部分：编码器和解码器。编码器和解码器一般都是用RNN。编码器通过RNN网络将数据编码为指定的维度的输出，解码器从编码器的输出中解码为需要的维度，从而解决了输入与输出的对齐问题。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=6687cd95afe547efa971a92958e4cc76&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;以一个对话系统为例，主要的结构如图3.1。&lt;/p&gt;
+&lt;p&gt;图3.1Seq2Seq结构示意图&lt;/p&gt;
+&lt;p&gt;输入的句子是“我爱NLP”,经过编码器的序列，编码器的隐藏层链接输出层的隐藏层。&lt;code&gt;&amp;lt;S&amp;gt;&lt;/code&gt;为输出的开始。“&lt;code&gt;&amp;lt;S&amp;gt;&lt;/code&gt;”经过隐藏层，输出第一个预测：“Me”,输出值“Me”作为下一刻的输入，再进入隐藏层。当输出为 &lt;code&gt;&amp;lt;/S&amp;gt;&lt;/code&gt;表示输出的结束。这时候整个输入输出的流程就结束了。&lt;/p&gt;
+&lt;p&gt;循环神经网络因其本身的时序特性和前后依赖特性，适合用来做生成式任务。但是因为循环神经网络自身存在的长期依赖性问题，在某一时刻的预测若与该时刻较远的输入有很大相关关系时，RNN可能是不包含这些信息的，导致预测不准确。因此，在Seq2Seq的机构中，通常使用长短期记忆模型（LSTM）通过输入门、遗忘门和输出门来控制RNN要记住的内容，从而提升了对长距离内容的记忆效果。&lt;/p&gt;
+&lt;p&gt;图3.1是最基本的Seq2Seq结构，在实际的使用中通常会在编码器和解码器之间有一个存储区域（context），用来存储编码器的所有隐藏层信息，而不是解码器仅仅依赖最后一层隐藏层。此时，编码器将输入映射为固定长度，解码器根据编码器的(context)来生成内容输出。户保田[75]等人的论文中证明，使用了context的Seq2Seq模型相比不使用context，生成的摘要在R-1,R-2,R-L都有较大幅度的提升。&lt;/p&gt;
+&lt;p&gt;Seq2Seq结构有效地解决了源输入数据与输出数据的对齐问题。文本摘要的长度通常都小于文本的长度。但是仅仅依赖与循环神经网络的Seq2Seq模型的信息的编码能力仍有待加强。特别是解码器不考虑长度，将输入内容压缩为固定的长度带来信息的丢失。输入是特别长的文章时，这种信息的丢失将会更加明显。在输入的文本中，不同的句子对最终的摘要重要性是不同的，但在编码器中被压缩的文本并没有权重上的分别。&lt;/p&gt;
+&lt;h2 id=&#34;注意力机制注意力自注意力多头注意力&#34;&gt;注意力机制：注意力、自注意力、多头注意力
+&lt;/h2&gt;&lt;h3 id=&#34;注意力&#34;&gt;注意力
+&lt;/h3&gt;&lt;p&gt;基本的序列到序列模型的编码器会把输入内容压缩到固定的长度，但是在输入的内容比较长的时候，就不能有效地记住足够的信息了，这是序列到序列模型的一个重要问题。Bahdanau等人[46]在2015年发表了一篇机器翻译的文章提到了一种注意力机制。注意力机制在编码器的部分，对输入的不同部分建立一个索引，在输出阶段可以随时来回看与输入相关的输入片段，这样编码器在输出时就不需要存储所有的信息了。加入注意力机制的序列到序列模型可以有效地解决这个问题。其基本的结构如图3.2。&lt;/p&gt;
+&lt;p&gt;这里编码器使用了一个双向的LSTM模型，Attention机制主要是在解码器进行解码时产生作用。其中涉及到的公式如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=422dd4221cb7496985434521da6d5cf7&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿**$a_t=attn(hs,s_i), i =t-1$**﻿&lt;/p&gt;
+&lt;p&gt;﻿**$a_s = Softmax(a)_t$**﻿&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=5c0f393e8da44555a46a81101a8d62ae&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;解码器在t时刻时，根据编码器的隐藏层输出h,和当前的解码器的隐藏层输出s_t，来计算在不同的输入i(i表示输入的次序，h_i表示第i个输入的隐藏层输出，包括正反两个方向)的得分e_i^t。然后将得分归一化，生成Attention的权重a^t。Attention的权重与对应的编码器的隐藏层相乘，得到t时刻输出应该关注的输入内容h_t^*，进而根据输入h_t^*和解码器的隐藏层输出s_t得到当前的输出P_t (w)。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=0eb1109cbed34a44834d176dc99128b8&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;注意力机制去掉了编码器与解码器之间的数据压缩过程，直接数据流通，可以使得Seq2Seq结构不必再映射成为一个固定的长度。同时解码器的每一时刻都直接关注与当前输出有关的编码端信息，不但加速了信息的流动速度，也增强了获取信息的质量。Nallapati[36]等人的实验也证明了注意力机制在文本摘要任务中的有效性。&lt;/p&gt;
+&lt;p&gt;但是注意力机制的运用也使得另一个问题愈发明显：内容重复生成。这是因为注意力机制使得生成内容时，会重点关注输入中某一部分重点内容，从使得生成的句子冲出现重复的单词。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=42af4e36e6444445b8d056ca91a0c00f&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/SunshineSki/article/details/115680648&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;深度学习笔记：如何理解激活函数？（附常用激活函数）_什么是激活函数?举例说明几种常见的激活函数及其用途-CSDN博客&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=7f86feabcb9642879c2e7c87fca864dd&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;自注意力&#34;&gt;自注意力
+&lt;/h3&gt;&lt;p&gt;注意机制关注的是t时刻的输出与输入序列各部分的关系，而自注意力机制关注的是输入序列中各个部分的相互关系。根据这些相互关系来重新表示每个词汇。如句子：“我爱自然语言处理，学习它我能得到很高的成就感”。句子中的“它”指的是“自然语言处理”，两者具有很强的关系；“我”和“自然语言处理”分别是“学习”的执行者和执行对象，也都有一定的关系。自注意力机制便是要挖掘词汇中的这些关系。具体的计算如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=7be2857259e24c44aaf1f6c5795c33de&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=9d76e3bd4246439fb25112fad958bd20&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://0809zheng.github.io/2020/04/24/self-attention.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://0809zheng.github.io/2020/04/24/self-attention.html&lt;/a&gt;﻿&lt;/p&gt;
+&lt;h3 id=&#34;自注意力和注意力机制的区别&#34;&gt;自注意力和注意力机制的区别：
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;注意力机制的权重参数是一个全局可学习参数，对于模型来说是固定的；而自注意力机制的权重参数是由输入决定的，即使是同一个模型，对于不同的输入也会有不同的权重参数。&lt;/li&gt;
+&lt;li&gt;注意力机制的输出序列长度与输入序列长度可以是不同的；而自注意力机制的的输出序列长度与输入序列长度必须是相同的。&lt;/li&gt;
+&lt;li&gt;注意力机制在一个模型中通常只使用一次，作为编码器和解码器之间的连接部分；而自注意力机制在同一个模型中可以使用很多次，作为网络结构的一部分。&lt;/li&gt;
+&lt;li&gt;注意力机制擅长捕捉两个序列之间的关系，如机器翻译任务中将一个序列映射为另一个序列；而自注意力机制擅长捕捉单个序列内部的关系，如作为预训练语言模型的基本结构。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;编码器与解码器&#34;&gt;编码器与解码器
+&lt;/h2&gt;&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/nocml/article/details/103082600&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Transformer(一)&amp;ndash;论文翻译：Attention Is All You Need 中文版-CSDN博客&lt;/a&gt;﻿&lt;/p&gt;
+&lt;h3 id=&#34;位置编码&#34;&gt;位置编码
+&lt;/h3&gt;&lt;p&gt;自注意力机使得模型可以有效地并行计算，但是却没有RNN的输入序列信息。为了解决这一问题，在输入词汇性自注意力计算之前加上一层位置编码，再进行运算，使得位置信息也能参与到自注意力的表示中。Transformers中使用使用正弦函数和余弦函数来构造位置编码:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=bd0b800f3aea4e688575289bea4719ea&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;编码器&#34;&gt;编码器
+&lt;/h2&gt;&lt;p&gt;编码器由输入层和若干个叠加的编码层构成。输入层包括合并词向量和位置编码。每个编码层中又顺序包括自注意力层、正则化层、全连接的前馈神经网络层、正则化层。输入层的词向量首先进入自注意力层获取由相关关系表示的输入，进入正则化层进行处理，再进入前馈网络层，再进行正则化，最后输出，进入下一个编码层，直到最后输出。具体流程如图2.4所示&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;残差链接层&amp;amp;归一化层（add &amp;amp;normalize）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;参考链接：&lt;/p&gt;
+&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://developer.volcengine.com/articles/7389519960881496075&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://developer.volcengine.com/articles/7389519960881496075&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;基本上所有的归一化技术，都可以概括为如下的公式：&lt;/strong&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=3e04ad12b5544b2198f99c559500a74b&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;strong&gt;对于隐层中某个节点的输出，即激活值a，进行非线性变换（如ReLU、tanh等）后得到h。&lt;/strong&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;****层归一化的过程&lt;strong&gt;&lt;strong&gt;&lt;strong&gt;&lt;strong&gt;就是先计算这一层所有激活值的均值μ和方差σ²，然后使用这些统计量&lt;/strong&gt;&lt;/strong&gt;&lt;/strong&gt;&lt;/strong&gt;对h进行分布调整。****&lt;strong&gt;&lt;strong&gt;这种调整就是把“高瘦”和“矮胖”的都调整回正常体型（深粉色），把偏离x=0的拉回中间来（淡紫色）。&lt;/strong&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=ce3adf080058463da8f15a565ace3feb&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;解码器&#34;&gt;解码器：
+&lt;/h3&gt;&lt;p&gt;类似于编码器，解码器也包含若干个叠加的解码层，最后通过一个线性连接层和输出层输出预测。在每个编码层中，首先是解码器的输入转化为输入向量（词向量+位置编码），通过注意力层和正则化层。这时候，需要将编码器的输出映射成为K,和V,来计算输入层在此刻输出的权重，并对输入进行加权计算。然后再进入一个正则化层，前向网络层，再进入一个正则化层，输出到下一个解码层。在所有的解码器层顶端通过线性连接层和softmax层输出结果。编码器到解码器的具体的流程如图2.5。&lt;/p&gt;
+&lt;p&gt;综合自注意力机制、位置编码、编码器和解码器，Transformer的整体的模型结构如&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=6bfc819ee2404f47a34edd18c48c2fcc&amp;amp;docGuid=oAA1OqieLOlvNV&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;h2 id=&#34;transformer模型的计算量评估&#34;&gt;Transformer模型的计算量评估
+&lt;/h2&gt;&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://mp.weixin.qq.com/s/NoREsyLXNVk1aABtSkhBDA&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;万字长文解析：大模型需要怎样的硬件算力&lt;/a&gt;﻿&lt;/p&gt;
+&lt;h2 id=&#34;transformer模型可视化&#34;&gt;Transformer模型可视化
+&lt;/h2&gt;&lt;p&gt;﻿&lt;a class=&#34;link&#34; href=&#34;https://bbycroft.net/llm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://bbycroft.net/llm&lt;/a&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;﻿&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;&#34; &gt;理解Transformer_从0到1.pdf&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title></title>
+        <link>https://blog.liu-nian.top/ops/github-mcp/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://blog.liu-nian.top/ops/github-mcp/</guid>
         <description></description>
         </item>
         <item>

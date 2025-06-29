@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="发票合规验证助手 1.1 背景： 发票报销是每个公司员工常见的工作之一。一般公司的报销制度都有比较复杂的规定和流程。员工在报销时没注意到销制度的一些细节，便容易出现所报销的发票不符合公司的规定的情况，导致了许多额外的工作量。同时很多公司采用纸质发票或者电子发票打印的方式进行报销，在报销审核流程上也要耗费很多的时间。 发票合规验证助手智能体用于解决以上问题。利用大模型调用文本识别接口，自动识别电子发票，方便线上审核。根据发票信息，大模型查询公司的报销制度手册，判断发票是否满足公司的报销规范，并告知用户。 1.2 方案设计 ">
+<title>基于APPBuildr的智能体实战案例-报销助手</title>
+
+<link rel='canonical' href='https://blog.liu-nian.top/ai/%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B-%E6%8A%A5%E9%94%80%E5%8A%A9%E6%89%8B/'>
+
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="基于APPBuildr的智能体实战案例-报销助手">
+<meta property='og:description' content="发票合规验证助手 1.1 背景： 发票报销是每个公司员工常见的工作之一。一般公司的报销制度都有比较复杂的规定和流程。员工在报销时没注意到销制度的一些细节，便容易出现所报销的发票不符合公司的规定的情况，导致了许多额外的工作量。同时很多公司采用纸质发票或者电子发票打印的方式进行报销，在报销审核流程上也要耗费很多的时间。 发票合规验证助手智能体用于解决以上问题。利用大模型调用文本识别接口，自动识别电子发票，方便线上审核。根据发票信息，大模型查询公司的报销制度手册，判断发票是否满足公司的报销规范，并告知用户。 1.2 方案设计 ">
+<meta property='og:url' content='https://blog.liu-nian.top/ai/%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B-%E6%8A%A5%E9%94%80%E5%8A%A9%E6%89%8B/'>
+<meta property='og:site_name' content='流年'>
+<meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2024-12-01T17:29:32&#43;08:00'/><meta property='article:modified_time' content='2024-12-01T17:29:32&#43;08:00'/>
+<meta name="twitter:title" content="基于APPBuildr的智能体实战案例-报销助手">
+<meta name="twitter:description" content="发票合规验证助手 1.1 背景： 发票报销是每个公司员工常见的工作之一。一般公司的报销制度都有比较复杂的规定和流程。员工在报销时没注意到销制度的一些细节，便容易出现所报销的发票不符合公司的规定的情况，导致了许多额外的工作量。同时很多公司采用纸质发票或者电子发票打印的方式进行报销，在报销审核流程上也要耗费很多的时间。 发票合规验证助手智能体用于解决以上问题。利用大模型调用文本识别接口，自动识别电子发票，方便线上审核。根据发票信息，大模型查询公司的报销制度手册，判断发票是否满足公司的报销规范，并告知用户。 1.2 方案设计 ">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/logo_hu_fd3008965b65babe.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">流年</a></h1>
+            <h2 class="site-description">这个人很懒，暂时啥都没写</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/Williamyzd'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/william-19-37'
+                        target="_blank"
+                        title="知乎"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738662787698" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10144" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M526.677333 766.421333l-72.021333 45.824-90.922667-142.933333c-18.773333 59.818667-50.005333 113.706667-91.264 163.2-17.152 20.608-34.986667 39.168-55.509333 58.666667-6.613333 6.272-33.066667 30.592-37.461333 34.986666l-60.330667-60.330666c5.930667-5.930667 33.578667-31.36 39.04-36.522667 18.346667-17.408 33.92-33.706667 48.725333-51.456 54.016-64.768 86.613333-136.96 91.178667-223.189333H128v-85.333334h170.666667V298.666667h-37.034667c-29.397333 54.016-66.474667 94.805333-111.701333 121.898666L106.069333 347.434667c59.52-35.754667 103.466667-111.104 129.621334-228.693334l83.285333 18.517334c-5.973333 27.008-12.928 52.352-20.864 76.074666H490.666667v85.333334H384v170.666666h106.666667v85.333334H391.893333l134.784 211.754666z m163.754667-2.986666L738.048 725.333333H810.666667V298.666667h-170.666667v426.666666h31.402667l19.029333 38.101334zM554.666667 213.333333h341.333333v597.333334h-128l-106.666667 85.333333-42.666666-85.333333H554.666667V213.333333z" p-id="10145" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://mp.weixin.qq.com/s/YOHKU850wcmPfWCjeAZ7zw'
+                        target="_blank"
+                        title="wechat"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738662705411" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9050" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M767.818667 409.173333C867.338667 444.266667 938.666667 539.136 938.666667 650.666667c0 42.709333-10.496 83.978667-30.261334 120.842666-1.792 3.338667-4.992 8.928-9.696 16.96l14.613334 53.557334c6.506667 23.893333-15.402667 45.813333-39.296 39.296l-53.642667-14.634667-6.229333 3.669333A254.933333 254.933333 0 0 1 682.666667 906.666667c-77.994667 0-147.84-34.88-194.805334-89.888a352.608 352.608 0 0 1-56.64 4.554666c-63.338667 0-124.266667-16.853333-177.472-48.298666-1.834667-1.088-6.410667-3.733333-13.632-7.893334l-80.544 21.653334c-23.914667 6.432-45.76-15.573333-39.146666-39.434667l21.792-78.752a961.205333 961.205333 0 0 1-15.904-27.317333A336.384 336.384 0 0 1 85.333333 480c0-188.618667 154.965333-341.333333 345.888-341.333333 159.914667 0 297.984 108.010667 335.818667 259.296 0.949333 3.765333 1.173333 7.552 0.778667 11.2z m-68.106667-13.952C662.88 282.037333 555.178667 202.666667 431.221333 202.666667 275.434667 202.666667 149.333333 326.933333 149.333333 480c0 46.272 11.498667 90.837333 33.194667 130.698667 2.88 5.290667 10.176 17.706667 21.621333 36.746666a32 32 0 0 1 3.413334 25.013334l-10.517334 37.994666 39.232-10.549333a32 32 0 0 1 24.234667 3.146667c14.272 8.192 22.773333 13.098667 25.802667 14.890666A283.882667 283.882667 0 0 0 431.221333 757.333333c6.154667 0 12.288-0.192 18.389334-0.576A255.061333 255.061333 0 0 1 426.666667 650.666667c0-141.386667 114.613333-256 256-256 5.728 0 11.413333 0.192 17.045333 0.554666z m133.706667 397.056a32 32 0 0 1 3.338666-24.725333 996.672 996.672 0 0 0 15.242667-26.293333A190.997333 190.997333 0 0 0 874.666667 650.666667c0-106.037333-85.962667-192-192-192s-192 85.962667-192 192 85.962667 192 192 192a190.933333 190.933333 0 0 0 98.570666-27.2c2.208-1.322667 8.288-4.874667 18.517334-10.837334a32 32 0 0 1 24.522666-3.210666l12.565334 3.424-3.424-12.565334zM330.666667 426.666667a42.666667 42.666667 0 1 1 0-85.333334 42.666667 42.666667 0 0 1 0 85.333334z m192 0a42.666667 42.666667 0 1 1 0-85.333334 42.666667 42.666667 0 0 1 0 85.333334z m85.333333 202.666666a32 32 0 1 1 0-64 32 32 0 0 1 0 64z m149.333333 0a32 32 0 1 1 0-64 32 32 0 0 1 0 64z" fill="#8a8a8a" p-id="9051"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/ai' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342212304" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4225" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M501.824 32C303.552 32 141.504 176.992 141.504 357.76c0 23.712 2.816 47.104 8.32 69.856l-51.008 114.208a32 32 0 0 0 24.704 44.736c54.272 7.744 76.672 31.168 76.672 77.312v111.552a64 64 0 0 0 64 64h20.704a64 64 0 0 1 64 64V960a32 32 0 0 0 32 32h345.6a32 32 0 0 0 0-64h-313.6v-24.608a128 128 0 0 0-128-128h-20.736v-111.552c0-65.664-32.192-110.688-91.2-131.136l39.872-89.28a31.968 31.968 0 0 0 1.568-21.792 233.088 233.088 0 0 1-8.896-63.904c0-143.712 131.936-261.76 296.32-261.76s296.32 118.016 296.32 261.76a32 32 0 0 0 64 0C862.144 176.992 700.064 32 501.824 32zM904 448a32 32 0 0 0-32 32v360a32 32 0 0 0 64 0V480a32 32 0 0 0-32-32z" p-id="4226"></path><path d="M673.888 466.656c-11.744-25.568-48.416-24.64-58.816 1.536l-132.8 333.76a32 32 0 0 0 59.488 23.68l32.608-81.92c0.576 0.032 1.088 0.32 1.664 0.32h154.848l38.176 83.104a31.968 31.968 0 1 0 58.144-26.72l-153.312-333.76zM599.68 680l47.264-118.72 54.528 118.72H599.68z" p-id="4227"></path></svg>
+                
+                <span>AI</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/cs' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342654057" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9507" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M954.1888 786.3552h-332.032v178.176h130.8416c16.0256 0 29.4912 12.928 29.4912 29.4656 0 16.5632-12.928 30.0032-29.4912 30.0032H271.0016a29.4912 29.4912 0 0 1-29.4912-29.4912c0-16.5376 12.928-29.9776 29.4912-29.9776h130.3296v-178.176H69.8112A69.8368 69.8368 0 0 1 0 716.544V69.8112A70.1696 70.1696 0 0 1 69.8112 0h884.3776A69.8368 69.8368 0 0 1 1024 69.8112V716.544a69.8368 69.8368 0 0 1-69.8112 69.8112z m-492.8768 178.176h100.864v-178.176h-100.864v178.176zM964.5312 59.4688H59.4688v667.4176h905.0624V59.4688zM175.3344 364.8512l107.5456-108.0832c5.7088-5.6832 12.9536-8.7808 21.2224-8.7808 7.7568 0 15.5136 3.0976 21.1968 8.7808 11.904 11.392 11.3664 30.5152 0 41.8816l-92.0576 92.0832 92.0576 92.032a30.1568 30.1568 0 0 1-0.512 42.4192 28.16 28.16 0 0 1-20.6848 8.7808c-7.7568 0-15.0016-3.0976-20.6848-8.7808l-107.0592-107.0592-1.024-1.024a59.52 59.52 0 0 1-5.7088-4.6592 29.2864 29.2864 0 0 1-8.7808-21.1968v-1.0496c0-8.2688 3.0976-15.5136 8.7808-21.1968a23.3472 23.3472 0 0 1 5.7088-4.1472z m391.4752-112.7424a30.9248 30.9248 0 0 1 25.8816-15.488c5.1712 0 10.3424 1.536 14.976 4.1216 7.2448 4.1216 11.904 10.3424 13.9776 18.0992 2.0736 7.7568 1.024 16.0256-3.0976 22.7584l-160.8448 278.2464a30.1312 30.1312 0 0 1-40.3456 10.8544 29.2352 29.2352 0 0 1-11.3664-40.3456l160.8192-278.2464z m123.1104 41.9072c0-8.2944 3.0976-15.5136 8.7808-21.2224 5.6832-5.6832 13.44-8.7808 21.1968-8.7808 7.7568 0 15.0016 3.0976 20.6848 8.7808l107.0592 107.0592 1.0496 0.512c2.048 1.0496 4.1216 2.5856 5.6832 4.1472 5.6832 5.6832 8.7808 13.44 8.7808 21.1968v3.1232c-0.512 7.2448-3.6096 13.952-8.7808 19.1232-1.5616 1.536-3.0976 2.5856-5.1712 5.6832l-108.1088 108.0832a30.08 30.08 0 0 1-21.1968 8.8064c-8.2688 0-15.5136-3.0976-21.1968-8.8064a30.1568 30.1568 0 0 1-8.7808-21.1968c0-8.2688 3.0976-15.5136 8.7808-21.1968l92.0576-92.0576-92.0576-92.0576a30.1568 30.1568 0 0 1-8.7808-21.1968z" fill="#7C848E" p-id="9508"></path></svg>
+                
+                <span>CS基础</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/ops' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342768989" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11403" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M685.1 727.2h4.1c77.5-19 135.9-69.3 150.9-133.2 8.2-36.7 1.4-66.6-1.4-77.5-17.7-69.3-77.5-119.6-150.9-126.4h-19c-32.6-59.8-95.2-96.5-163.1-96.5-91.1 0-168.6 66.6-183.5 153.6-73.4 4.1-130.5 63.9-130.5 138.7 0 77.5 63.9 140 141.4 140h334.4M656.4 672H346.7c-51.6 0-93.2-41.6-93.2-91.9 0-51.6 41.6-93.2 93.2-93.2h2.5l20.1 1.3 1.3-18.9c5-70.5 64.2-124.7 134.7-124.7 52.9 0 100.7 31.5 123.4 79.3l6.3 12.6 13.9-1.3c7.6-1.3 13.9-1.3 22.7-1.3 51.6 5 93.2 40.3 105.8 89.4 2.5 7.6 7.6 29 1.3 54.1-10.1 44.1-52.9 79.3-108.3 94.4" fill="#444444" p-id="11404"></path><path d="M949.7 475c-13.3 0-25-9.7-27.1-23.3C908 357.5 860 271 787.4 208.2c-35.9-31.1-76.6-55.3-120.8-72.1-45.8-17.4-94-26.2-143.4-26.2-136.4 0-262.7 68.1-337.8 182.3-8.4 12.7-25.4 16.2-38.1 7.9-12.7-8.4-16.2-25.4-7.9-38.1C224.7 132.4 368.2 55 523.2 55c56.1 0 110.9 10 162.9 29.8 50.2 19.1 96.4 46.6 137.2 81.9 82.4 71.3 137 169.5 153.6 276.7 2.3 15-8 29.1-23 31.4-1.4 0.1-2.8 0.2-4.2 0.2zM523.2 973.2c-62 0-122.1-12.1-178.7-36.1-54.7-23.1-103.8-56.2-145.9-98.4-42.2-42.2-75.3-91.3-98.4-145.9-24-56.6-36.1-116.8-36.1-178.7 0-15.5 0.8-31.2 2.3-46.6 1.5-15.1 15-26.1 30.1-24.6 15.1 1.5 26.1 15 24.6 30.1-1.4 13.6-2.1 27.4-2.1 41.1 0 54.6 10.7 107.5 31.7 157.3 20.4 48.1 49.5 91.3 86.6 128.5 37.1 37.1 80.3 66.3 128.5 86.6 49.8 21.1 102.7 31.7 157.3 31.7 86.1 0 168.4-26.7 237.7-77.3 33.4-24.4 62.8-53.6 87.4-86.8 24.9-33.6 44.3-70.7 57.6-110.1 4.9-14.4 20.5-22.1 34.9-17.2 14.4 4.9 22.1 20.5 17.2 34.9-15.2 44.8-37.3 86.9-65.5 125.1-27.9 37.7-61.3 70.9-99.3 98.6-78.6 57.5-172 87.8-269.9 87.8z" fill="#444444" p-id="11405"></path><path d="M75.5 405.1l-56.6 98c-6.2 10.8 1.6 24.2 14 24.2H146c12.4 0 20.2-13.5 14-24.2l-56.6-98c-6.2-10.7-21.7-10.7-27.9 0zM952.3 501.2l54.4-94.2c6.7-11.6-1.7-26.1-15.1-26.1H882.8c-13.4 0-21.8 14.5-15.1 26.1l54.4 94.2c6.8 11.6 23.5 11.6 30.2 0z" fill="#444444" p-id="11406"></path></svg>
+                
+                <span>运维&amp;工具</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#发票合规验证助手">发票合规验证助手</a>
+      <ol>
+        <li><a href="#11-背景">1.1 背景：</a></li>
+        <li><a href="#12-方案设计">1.2 方案设计</a></li>
+        <li><a href="#13--prompt编写">1.3  Prompt编写</a></li>
+        <li><a href="#14-prompt优化策略">1.4 Prompt优化策略</a></li>
+        <li><a href="#15-最终prompt与效果展示">1.5 最终Prompt与效果展示</a></li>
+      </ol>
+    </li>
+    <li><a href="#智能报销智能体">智能报销智能体</a>
+      <ol>
+        <li><a href="#21-背景">2.1 背景</a></li>
+        <li><a href="#22-方案设计">2.2 方案设计</a></li>
+        <li><a href="#23-prompt编写">2.3 Prompt编写</a>
+          <ol>
+            <li><a href="#231-发票识别组件">2.3.1 发票识别组件</a></li>
+            <li><a href="#232-发票信息合规判断组件">2.3.2 发票信息合规判断组件</a></li>
+            <li><a href="#233-发票验真组件">2.3.3 发票验真组件</a></li>
+          </ol>
+        </li>
+        <li><a href="#24-整体智能体工作流如下">2.4 整体智能体工作流如下：</a></li>
+        <li></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/ai/%E6%99%BA%E8%83%BD%E4%BD%93%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B-%E6%8A%A5%E9%94%80%E5%8A%A9%E6%89%8B/">基于APPBuildr的智能体实战案例-报销助手</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 01, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 11 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="发票合规验证助手">发票合规验证助手
+</h2><h3 id="11-背景">1.1 背景：
+</h3><pre><code>    发票报销是每个公司员工常见的工作之一。一般公司的报销制度都有比较复杂的规定和流程。员工在报销时没注意到销制度的一些细节，便容易出现所报销的发票不符合公司的规定的情况，导致了许多额外的工作量。同时很多公司采用纸质发票或者电子发票打印的方式进行报销，在报销审核流程上也要耗费很多的时间。
+
+    发票合规验证助手智能体用于解决以上问题。利用大模型调用文本识别接口，自动识别电子发票，方便线上审核。根据发票信息，大模型查询公司的报销制度手册，判断发票是否满足公司的报销规范，并告知用户。
+</code></pre>
+<h3 id="12-方案设计">1.2 方案设计
+</h3><p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/6c1a0fa6ae93e5dbca8a35f3d4e9f972c8166f03fe88943c113eea521f948c72.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 0"
+	
+	
+></p>
+<h3 id="13--prompt编写">1.3  Prompt编写
+</h3><p><a class="link" href="https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/assistant/a694c560-b3b9-4bc4-b6ae-95a4ca317174/831cec36-e8e1-464f-b802-38ea6dbc45b6"  target="_blank" rel="noopener"
+    >https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/assistant/a694c560-b3b9-4bc4-b6ae-95a4ca317174/831cec36-e8e1-464f-b802-38ea6dbc45b6</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span><span class="lnt">90
+</span><span class="lnt">91
+</span><span class="lnt">92
+</span><span class="lnt">93
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 角色
+</span></span><span class="line"><span class="cl">你是一位公司的财务人员，负责公司的报销制度制定与员工报销，以及回答员工问题。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 工具能力
+</span></span><span class="line"><span class="cl">使用通用文字识别技术，特别是高精度版，以准确识别并解析发票上的文字信息。
+</span></span><span class="line"><span class="cl">利用知识库中的员工报销手册来判断发票的识别结果是否合规。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 要求与限制
+</span></span><span class="line"><span class="cl">根据数据源的报销制度，验证发票是否可用于报销
+</span></span><span class="line"><span class="cl">确保识别的准确性，以避免任何因识别错误导致的验证失败。重点识别发票的关键信息，如日期、金额、商品或服务描述等。
+</span></span><span class="line"><span class="cl">请如实根据知识库与实际情况作答，不要假设场景。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 任务
+</span></span><span class="line"><span class="cl">1. 接受用户发票图片，系统使用通用文字识别技术解析并验证发票上的关键信息
+</span></span><span class="line"><span class="cl">2. 根据发票解析结果，根据员工报销手册，判断发票是否可报销
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出规范
+</span></span><span class="line"><span class="cl">如果发票可用，则输出：
+</span></span><span class="line"><span class="cl">该发票是否可用：输出是
+</span></span><span class="line"><span class="cl">如果发票不可用，则输出：
+</span></span><span class="line"><span class="cl">该发票是否可用：否
+</span></span><span class="line"><span class="cl">不可用原因：说明不能用的原因
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 示例1
+</span></span><span class="line"><span class="cl">发票可用的示例：
+</span></span><span class="line"><span class="cl">该发票是否可用：是
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">发票不可用示例：
+</span></span><span class="line"><span class="cl">该发票是否可用：否
+</span></span><span class="line"><span class="cl">不可用原因：
+</span></span><span class="line"><span class="cl">1. 报销金额超限
+</span></span><span class="line"><span class="cl">2. 发票抬头公司不符
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 数据源
+</span></span><span class="line"><span class="cl">员工报销手册
+</span></span><span class="line"><span class="cl">前言
+</span></span><span class="line"><span class="cl">本手册旨在明确百度在线网络技术(北京)有限公司（以下简称“公司”）员工在移动通讯费、工作交通费、交通费、业务洽谈费等方面的报销制度及流程，确保报销工作的规范化、透明化。请各位员工仔细阅读，并严格按照手册规定执行报销事宜。
+</span></span><span class="line"><span class="cl">第一章 总则
+</span></span><span class="line"><span class="cl">目的与原则
+</span></span><span class="line"><span class="cl">本手册的制定旨在规范员工报销行为，提高报销效率，确保公司财务的合规性与准确性。报销应遵循“实事求是、合理合规、及时准确”的原则。
+</span></span><span class="line"><span class="cl">适用范围
+</span></span><span class="line"><span class="cl">本手册适用于公司全体员工，包括但不限于全职员工、兼职员工、实习生等。
+</span></span><span class="line"><span class="cl">报销流程
+</span></span><span class="line"><span class="cl">员工需先垫付相关费用，并保留好原始发票、收据等凭证。然后，通过公司报销系统提交报销申请，附上相关凭证及说明。经部门主管审核、财务部门复核后，方可进行报销。
+</span></span><span class="line"><span class="cl">第二章 报销类型及限额
+</span></span><span class="line"><span class="cl">一、移动通讯费
+</span></span><span class="line"><span class="cl">报销范围
+</span></span><span class="line"><span class="cl">移动通讯费包括手机话费、上网流量费等因工作需要产生的通讯费用。
+</span></span><span class="line"><span class="cl">报销限额
+</span></span><span class="line"><span class="cl">每月移动通讯费报销限额为人民币200元。超出部分需员工自行承担。
+</span></span><span class="line"><span class="cl">开票要求
+</span></span><span class="line"><span class="cl">发票抬头需为“百度在线网络技术(北京)有限公司”。
+</span></span><span class="line"><span class="cl">二、工作交通费
+</span></span><span class="line"><span class="cl">报销范围
+</span></span><span class="line"><span class="cl">工作交通费包括因工作需要而产生的出租车费、地铁费、公交费等公共交通费用。
+</span></span><span class="line"><span class="cl">报销条件
+</span></span><span class="line"><span class="cl">工作交通费只允许报销晚上10点后至早上7点前、以及周末节假日全天所发生的费用。其他时间段产生的费用不予报销。
+</span></span><span class="line"><span class="cl">报销限额
+</span></span><span class="line"><span class="cl">每月工作交通费报销限额为人民币500元。超出部分需员工自行承担。
+</span></span><span class="line"><span class="cl">开票要求
+</span></span><span class="line"><span class="cl">发票抬头需为“百度在线网络技术(北京)有限公司”。
+</span></span><span class="line"><span class="cl">三、交通费
+</span></span><span class="line"><span class="cl">报销范围
+</span></span><span class="line"><span class="cl">交通费包括因工作需要而产生的长途汽车费、火车票、飞机票等费用。
+</span></span><span class="line"><span class="cl">报销限额
+</span></span><span class="line"><span class="cl">交通费报销需根据出差地点、出差天数等因素综合考虑，具体限额如下：
+</span></span><span class="line"><span class="cl">市内短途出差：每次不超过人民币100元；
+</span></span><span class="line"><span class="cl">省内长途出差：每次不超过人民币500元；
+</span></span><span class="line"><span class="cl">跨省长途出差：根据出差地点及交通工具类型，每次不超过人民币2000元。
+</span></span><span class="line"><span class="cl">超出限额部分需员工自行承担，并需提前向部门主管申请并获得批准。
+</span></span><span class="line"><span class="cl">开票要求
+</span></span><span class="line"><span class="cl">发票抬头需为“百度在线网络技术(北京)有限公司”。同时，需附上出差申请单、行程单等相关凭证。
+</span></span><span class="line"><span class="cl">四、业务洽谈费
+</span></span><span class="line"><span class="cl">报销范围
+</span></span><span class="line"><span class="cl">业务洽谈费为与客户吃饭产生的餐费，旨在促进业务合作与交流。
+</span></span><span class="line"><span class="cl">报销限额
+</span></span><span class="line"><span class="cl">每次业务洽谈费报销限额为人民币1000元。超出部分需员工自行承担，并需提前向部门主管申请并获得批准。
+</span></span><span class="line"><span class="cl">开票要求
+</span></span><span class="line"><span class="cl">发票抬头需为“百度在线网络技术(北京)有限公司”。同时，需附上业务洽谈邀请函、客户名单、菜单等相关凭证。
+</span></span><span class="line"><span class="cl">第三章 报销限制条件
+</span></span><span class="line"><span class="cl">费用日期限制
+</span></span><span class="line"><span class="cl">费用日期超过3个月以上不允许报销。请员工务必在费用发生后及时提交报销申请。
+</span></span><span class="line"><span class="cl">报销凭证要求
+</span></span><span class="line"><span class="cl">员工需保留好原始发票、收据等凭证，并确保凭证的真实性与完整性。无凭证或凭证不全者，不予报销。
+</span></span><span class="line"><span class="cl">特殊事项处理
+</span></span><span class="line"><span class="cl">对于因特殊原因产生的费用（如紧急出差、突发事件等），员工需提前向部门主管申请并获得批准。未经批准而产生的费用，不予报销。
+</span></span><span class="line"><span class="cl">第四章 报销审核与支付
+</span></span><span class="line"><span class="cl">审核流程
+</span></span><span class="line"><span class="cl">员工提交报销申请后，由部门主管进行初审。初审通过后，由财务部门进行复核。复核通过后，方可进行报销支付。
+</span></span><span class="line"><span class="cl">支付方式
+</span></span><span class="line"><span class="cl">公司采用银行转账方式支付报销款项。员工需在报销系统中填写正确的银行账户信息。因信息错误而导致的支付失败或延误，由员工自行承担。
+</span></span><span class="line"><span class="cl">支付时效
+</span></span><span class="line"><span class="cl">财务部门在收到完整的报销申请及凭证后，将在5个工作日内完成审核并支付报销款项。如遇特殊情况需延迟支付，财务部门将提前通知员工并说明原因。
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="14-prompt优化策略">1.4 Prompt优化策略
+</h3><p><strong>基于思维连策略细化任务内容</strong></p>
+<p>在判断是否满足员工报销制度要求时，为了方便大模型判断的准确性，使用Cot方式将处理过程进行拆解。任务部分的Prompt修改如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 任务
+</span></span><span class="line"><span class="cl">首先尝试回答以下问题：
+</span></span><span class="line"><span class="cl">1. 发票中的购买方（开票抬头公司）是谁？销售方是谁？
+</span></span><span class="line"><span class="cl">2. 发票中消费或购买的是什么服务？
+</span></span><span class="line"><span class="cl">3. 发票中的消费金额是多少？
+</span></span><span class="line"><span class="cl">4. 发票的开票日期是多少？
+</span></span><span class="line"><span class="cl">基于上一步的判断，根据员工报销制度手册，回答以下问题：
+</span></span><span class="line"><span class="cl">1. 根据发票信息，将该发票划分为公司报销类型中的一种，并说明是哪一种？
+</span></span><span class="line"><span class="cl">2. 今天是哪天，开票日期距今多久，是否在公司许可时效范围内？
+</span></span><span class="line"><span class="cl">3. 开票金额是否在公司需要范围内？
+</span></span><span class="line"><span class="cl">4. 购买方公司名称是什么？是否满足公司发票抬头要求？
+</span></span><span class="line"><span class="cl">根据对以上问题的回答和理解，判断该发票是否可用于报销
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>使用知识库来存储员工手册</strong></p>
+<p>使用外部知识库的方式可以更好地对员工手册进行切片，增强大模型的检索和理解能力。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/51279b0329bdc12940150822e1d55464e0385e79c33ed40a81d056bd647d3ff8.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 2"
+	
+	
+></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/344ed8d3b98f64fa1d9614e909506cc43af5e57faaefdb8c22245edf43b88402.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 3"
+	
+	
+></p>
+<h3 id="15-最终prompt与效果展示">1.5 最终Prompt与效果展示
+</h3><p>最终的Prompt如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 角色
+</span></span><span class="line"><span class="cl">你是一位公司的财务人员，负责公司的报销制度制定与员工报销，以及回答员工问题。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 工具能力
+</span></span><span class="line"><span class="cl">使用通用文字识别技术，特别是高精度版，以准确识别并解析发票上的文字信息。
+</span></span><span class="line"><span class="cl">利用知识库中的员工报销手册来判断发票的识别结果是否合规。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 要求与限制
+</span></span><span class="line"><span class="cl">根据知识库的报销制度，验证发票是否可用于报销
+</span></span><span class="line"><span class="cl">确保识别的准确性，以避免任何因识别错误导致的验证失败。重点识别发票的关键信息，如日期、金额、商品或服务描述等。
+</span></span><span class="line"><span class="cl">请如实根据知识库与实际情况作答，不要假设场景。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 任务
+</span></span><span class="line"><span class="cl">首先尝试回答以下问题：
+</span></span><span class="line"><span class="cl">1. 发票中的购买方（开票抬头公司）是谁？销售方是谁？
+</span></span><span class="line"><span class="cl">2. 发票中消费或购买的是什么服务？
+</span></span><span class="line"><span class="cl">3. 发票中的消费金额是多少？
+</span></span><span class="line"><span class="cl">4. 发票的开票日期是多少？
+</span></span><span class="line"><span class="cl">基于上一步的判断，根据知识库中的员工报销制度手册，回答以下问题：
+</span></span><span class="line"><span class="cl">1. 根据发票信息和员工报销手册，将该发票划分为公司报销类型中的一种，并说明是哪一种？
+</span></span><span class="line"><span class="cl">2. 今天是哪天，开票日期距今多久，是否在公司许可时效范围内？
+</span></span><span class="line"><span class="cl">3. 开票金额是否在公司需要范围内？
+</span></span><span class="line"><span class="cl">4. 购买方公司名称是什么？是否满足公司发票抬头要求？
+</span></span><span class="line"><span class="cl">根据对以上问题的回答和理解，判断该发票是否可用于报销
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出规范
+</span></span><span class="line"><span class="cl">如果发票可用，则输出：
+</span></span><span class="line"><span class="cl">该发票是否可用：输出是或者否
+</span></span><span class="line"><span class="cl">如果发票不可用，则输出：
+</span></span><span class="line"><span class="cl">该发票是否可用：否
+</span></span><span class="line"><span class="cl">不可用原因：说明不能用的原因
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#  示例1 
+</span></span><span class="line"><span class="cl">该发票是否可用：是
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 示例 2
+</span></span><span class="line"><span class="cl">该发票是否可用：否
+</span></span><span class="line"><span class="cl">不可用原因：
+</span></span><span class="line"><span class="cl">1. 报销金额超限
+</span></span><span class="line"><span class="cl">2. 发票抬头公司不符
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在APPBuilder中的设置效果如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/bda86ede9c33d57ec1a7f58a0d19deaf7dd173e9bc9308a97f21282822664406.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 5"
+	
+	
+></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/d2c79ee616264d31de79ea78b4b0c537ef6e171fe949ffe9038f593904b61063.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 6"
+	
+	
+></p>
+<h2 id="智能报销智能体">智能报销智能体
+</h2><h3 id="21-背景">2.1 背景
+</h3><p>上一个案例仅仅使用智能体实现了一个发票的合规性检查工作。实际上我们还可以做得更多。基于以上的验证结果，我们还可以进行如下的工作：</p>
+<ul>
+<li>调用外部的api，对发票的真实性进行验证；</li>
+<li>抽取信息形成报销表单并对接到公司的审批流中；</li>
+<li>同时我们也可以利用智能体的记忆功能保存员工手册中的知识、报销单据，并进行询问和统计；</li>
+</ul>
+<h3 id="22-方案设计">2.2 方案设计
+</h3><p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/5bea042046e2361d30f882bb878e215164618e1c7c936c5f3697371f36cdb915.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 7"
+	
+	
+></p>
+<p><a class="link" href="https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/chatflow/1832bf3c-d051-490b-bc64-70c91e404214/27702d2a-038e-468d-98f3-b217d4258e31"  target="_blank" rel="noopener"
+    >https://console.bce.baidu.com/ai_apaas/personalSpace/app/debugger/chatflow/1832bf3c-d051-490b-bc64-70c91e404214/27702d2a-038e-468d-98f3-b217d4258e31</a></p>
+<h3 id="23-prompt编写">2.3 Prompt编写
+</h3><p>我们需要再在这个项目中单独创建几个单独的部分：</p>
+<ul>
+<li>发票识别组件</li>
+<li>发票信息合规判断</li>
+<li>发票验真组件</li>
+<li>串联工作流和组件的Prompt和代码</li>
+</ul>
+<h4 id="231-发票识别组件">2.3.1 发票识别组件
+</h4><p><a class="link" href="https://console.bce.baidu.com/ai_apaas/workflow/cfe5049f-f9db-4669-b7fa-e1a2e402fe6e"  target="_blank" rel="noopener"
+    >https://console.bce.baidu.com/ai_apaas/workflow/cfe5049f-f9db-4669-b7fa-e1a2e402fe6e</a></p>
+<p>其中发票识别组件使用外部API接入的方式创建。如下图展示的发票识别组件在输入层了数据转换以方便获取图片的url地址。同样，在输出层也做了一层转换，以方便外部其他组件的调用时，可以直接获区拼装好的文字内容。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/ac213c76c707c7467e1e035c3a0f2a5614c4eb6d8b3e10a5856d626a2a62923a.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 8"
+	
+	
+></p>
+<h4 id="232-发票信息合规判断组件">2.3.2 发票信息合规判断组件
+</h4><p><a class="link" href="https://console.bce.baidu.com/ai_apaas/workflow/bd8c8e51-5b8f-4819-a517-8b7fcd0d8cc7"  target="_blank" rel="noopener"
+    >https://console.bce.baidu.com/ai_apaas/workflow/bd8c8e51-5b8f-4819-a517-8b7fcd0d8cc7</a></p>
+<p>发票信息合规判断组件以query改写、知识库组件、发票类型判断和合规判断四部分为核心。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/d220d5ba3ef42916afba203802f8f4fc6349528cee560758c97a78b3daa2033e.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 9"
+	
+	
+></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 角色
+</span></span><span class="line"><span class="cl">你是一位公司的财务人员，帮助员工回答报销问题
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 任务
+</span></span><span class="line"><span class="cl">基于{{content}}，来回答{{query}}，以json格式输出结果
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出要求
+</span></span><span class="line"><span class="cl">输出格式：json
+</span></span><span class="line"><span class="cl">输出字段以及含义如下：
+</span></span><span class="line"><span class="cl">bx_type：公司报销类型中最有可能报销类型
+</span></span><span class="line"><span class="cl">xz_reason：选择这种报销类型的原因
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出示例
+</span></span><span class="line"><span class="cl">{ 
+</span></span><span class="line"><span class="cl">&#34;bx_type&#34;:&#34;业务洽谈费&#34;,
+</span></span><span class="line"><span class="cl">&#34;xz_reason&#34;:&#34;该发票属于餐饮费，可用于公司业务洽谈费的报销范围&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 角色
+</span></span><span class="line"><span class="cl">你是一位公司的财务人员，负责公司的报销制度制定与员工报销，以及回答员工问题。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 任务
+</span></span><span class="line"><span class="cl">基于{{content}}，以及提交报销的日期为{{c_date}},来回答{{query}}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 特别注意
+</span></span><span class="line"><span class="cl">在判断发票是否可报销时要特别注意以今天为提交报销申请的时间节点，报销是否合规。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出要求
+</span></span><span class="line"><span class="cl">输出字段以及含义
+</span></span><span class="line"><span class="cl">code：0或1。0表示满足公司报销合规要求或找到用户咨询的答案，1表示不满足公司报销规定或没有找到用户合适的答案。
+</span></span><span class="line"><span class="cl">reason：满足或不满足公司合规要求的原因，或是用户问题的答案。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出示例
+</span></span><span class="line"><span class="cl">{ 
+</span></span><span class="line"><span class="cl">&#34;code&#34;:0,
+</span></span><span class="line"><span class="cl">&#34;reason&#34;:&#34;发票的金额、抬头、报销日期均符合报销要求&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>知识库生成Prompt:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#角色：
+</span></span><span class="line"><span class="cl">你是一名公司的财务人员，主要负责处理员工的报销制度编制和员工报销事宜。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#任务：
+</span></span><span class="line"><span class="cl">1. 编制一份员工报销手册，主要包括移动通讯费、工作交通费、交通费、业务洽谈费几种类型的报销。
+</span></span><span class="line"><span class="cl">2. 对报销添加限制条件，包括但不限于：
+</span></span><span class="line"><span class="cl">2.1 每种报销的限额以及月总费用的限额；
+</span></span><span class="line"><span class="cl">2.2 费用日期超过3个月以上不允许报销
+</span></span><span class="line"><span class="cl">2.3 工作交通费只允许报销晚上10点后至早上7点前、以及周末节假日全天所发生的费用
+</span></span><span class="line"><span class="cl">2.4 业务洽谈费为与客户吃饭产生的餐费
+</span></span><span class="line"><span class="cl">2.5 每种费用的开票抬头公司为：百度在线网络技术(北京)有限公司
+</span></span><span class="line"><span class="cl">3. 本手册内容不少于2000字
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#输出要求：
+</span></span><span class="line"><span class="cl">手册通俗易通，结构清晰，无歧义。
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>[附件]</p>
+<h4 id="233-发票验真组件">2.3.3 发票验真组件
+</h4><p><a class="link" href="https://console.bce.baidu.com/ai_apaas/workflow/d0e9467e-b1fc-4ee8-bf8f-a09706d9a0a6"  target="_blank" rel="noopener"
+    >https://console.bce.baidu.com/ai_apaas/workflow/d0e9467e-b1fc-4ee8-bf8f-a09706d9a0a6</a></p>
+<p><strong>发票验真API准备</strong></p>
+<p>这里生成一个模拟发票验证的接口，生成接口的Prompt如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#角色
+</span></span><span class="line"><span class="cl">你是一名python研发工程师
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">#任务
+</span></span><span class="line"><span class="cl">基于python3，使用flask框架生成一个发票验证接口，尽可能少的使用第三方框架。
+</span></span><span class="line"><span class="cl">具体要求如下：
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">1. 接口为post请求
+</span></span><span class="line"><span class="cl">2. 入参接受json格式，具体参数如下：
+</span></span><span class="line"><span class="cl">nomber:发票号
+</span></span><span class="line"><span class="cl">pay:购买方
+</span></span><span class="line"><span class="cl">sale:销售方
+</span></span><span class="line"><span class="cl">date:开票日期
+</span></span><span class="line"><span class="cl">account:发票金额
+</span></span><span class="line"><span class="cl">3. 返回参数：
+</span></span><span class="line"><span class="cl">code:0表示验证成功，1表示验证失败
+</span></span><span class="line"><span class="cl">msg:验证结果，主要是success和fail，分别对应code的0和1两种结果
+</span></span><span class="line"><span class="cl">4. 处理逻辑
+</span></span><span class="line"><span class="cl">以80%的概率返回成功，20%的概率返回失败。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># 输出要求
+</span></span><span class="line"><span class="cl">1. 所有代码在一个文件中。每个函数需要有详细的注释
+</span></span><span class="line"><span class="cl">2. 输入和输出都为json格式
+</span></span><span class="line"><span class="cl">3. 生成一个requrements.txt文件，包含所有依赖的第三方框架
+</span></span><span class="line"><span class="cl">#样例：
+</span></span><span class="line"><span class="cl">输入样例：
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">&#34;nomber&#34;:&#34;24112000003220018474944&#34;,
+</span></span><span class="line"><span class="cl">&#34;pay&#34;:&#34;xxxx有限公司&#34;,
+</span></span><span class="line"><span class="cl">&#34;sale&#34;:&#34;北京恒泰人合火锅店&#34;,
+</span></span><span class="line"><span class="cl">&#34;date&#34;:&#34;2024年04月03日&#34;,
+</span></span><span class="line"><span class="cl">&#34;account&#34;:&#34;246.23&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">输出样例：
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">&#34;code&#34;:0,
+</span></span><span class="line"><span class="cl">&#34;msg&#34;:&#34;success&#34;
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>代码文件：</p>
+<p>[附件]
+用于构建、发布服务的镜像Dockerfile如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">from python:3.10.0-slim-buster
+</span></span><span class="line"><span class="cl">run pip install flask  &amp;&amp; mkdir -p /opt/fpyz
+</span></span><span class="line"><span class="cl">copy app.py /opt/fpyz
+</span></span><span class="line"><span class="cl">workdir /opt/fpyz
+</span></span><span class="line"><span class="cl">cmd python /opt/fpyz/app.py
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>发票验真组件搭建</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/3e2a5537a26ee783df70860a51dd75319d6db46e0c278f673449728319158ab4.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 10"
+	
+	
+></p>
+<p>组件调试
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/b062edfe35c1485f0c77f5eb609cdf54608c6661cce6fa8b6e4ee29eed1d29a0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 11"
+	
+	
+></p>
+<h3 id="24-整体智能体工作流如下">2.4 整体智能体工作流如下：
+</h3><p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/d47ada3cc51f35c2cec51847d8f8063cc410f567a69d85231d816502aa450a08.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 12"
+	
+	
+></p>
+<p>2.5 智能体优化策略</p>
+<ol>
+<li>添加记忆变量，优化不同组件之间的变量传递</li>
+<li>对接外部接口或数据库，方便查询报销单的处理流程</li>
+</ol>
+<h3 id="">
+</h3>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2025 流年
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
