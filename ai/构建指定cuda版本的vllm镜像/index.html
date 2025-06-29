@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="https://blog.csdn.net/qq836825331/article/details/136846624\n下载镜像 Kustomize安装 1 2 curl -s &#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&#34; | bash chmod +x kustomize &amp;&amp; mv kustomize /usr/local/bin/ 下载镜像 1 2 3 4 5 6 7 wget https://github.com/kubeflow/manifests/archive/refs/tags/v1.8.1.tar.gz tar -zxvf v1.8.1.tar.gz cd v1.8.1 # 过滤出镜像，注意需要手动做下排查 kustomize build example |grep &#39;image: &#39;|awk &#39;$2 != &#34;&#34; { print $2}&#39; |sort -u # 下载镜像，并push到dockerhub &#34;for i in `cat images.txt`; do docker pull $i ;tag_w=`echo &#34;$i&#34; | sed &#39;s/\\//_/g&#39;`;tag_new=&#34;williamyang1/kubeflow_$tag_w&#34;;docker tag $i $tag_new ;docker push $tag_new ;docker rmi $tag_new $i;echo &#34;$tag_new&#34; &gt;&gt; n_images.txt; done&#34; 最终的镜像列表\n">
-<title>Kubeflow 安装</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="构建指定cuda版本的vllm镜像">
+<title>构建指定cuda版本的vllm镜像</title>
 
-<link rel='canonical' href='https://blog.liu-nian.top/ai/kubeflow%E5%AE%89%E8%A3%85/'>
+<link rel='canonical' href='https://blog.liu-nian.top/ai/%E6%9E%84%E5%BB%BA%E6%8C%87%E5%AE%9Acuda%E7%89%88%E6%9C%AC%E7%9A%84vllm%E9%95%9C%E5%83%8F/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Kubeflow 安装">
-<meta property='og:description' content="https://blog.csdn.net/qq836825331/article/details/136846624\n下载镜像 Kustomize安装 1 2 curl -s &#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&#34; | bash chmod +x kustomize &amp;&amp; mv kustomize /usr/local/bin/ 下载镜像 1 2 3 4 5 6 7 wget https://github.com/kubeflow/manifests/archive/refs/tags/v1.8.1.tar.gz tar -zxvf v1.8.1.tar.gz cd v1.8.1 # 过滤出镜像，注意需要手动做下排查 kustomize build example |grep &#39;image: &#39;|awk &#39;$2 != &#34;&#34; { print $2}&#39; |sort -u # 下载镜像，并push到dockerhub &#34;for i in `cat images.txt`; do docker pull $i ;tag_w=`echo &#34;$i&#34; | sed &#39;s/\\//_/g&#39;`;tag_new=&#34;williamyang1/kubeflow_$tag_w&#34;;docker tag $i $tag_new ;docker push $tag_new ;docker rmi $tag_new $i;echo &#34;$tag_new&#34; &gt;&gt; n_images.txt; done&#34; 最终的镜像列表\n">
-<meta property='og:url' content='https://blog.liu-nian.top/ai/kubeflow%E5%AE%89%E8%A3%85/'>
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="构建指定cuda版本的vllm镜像">
+<meta property='og:description' content="构建指定cuda版本的vllm镜像">
+<meta property='og:url' content='https://blog.liu-nian.top/ai/%E6%9E%84%E5%BB%BA%E6%8C%87%E5%AE%9Acuda%E7%89%88%E6%9C%AC%E7%9A%84vllm%E9%95%9C%E5%83%8F/'>
 <meta property='og:site_name' content='流年'>
-<meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2024-05-11T08:38:25&#43;00:00'/><meta property='article:modified_time' content='2024-05-11T08:38:25&#43;00:00'/>
-<meta name="twitter:title" content="Kubeflow 安装">
-<meta name="twitter:description" content="https://blog.csdn.net/qq836825331/article/details/136846624\n下载镜像 Kustomize安装 1 2 curl -s &#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&#34; | bash chmod +x kustomize &amp;&amp; mv kustomize /usr/local/bin/ 下载镜像 1 2 3 4 5 6 7 wget https://github.com/kubeflow/manifests/archive/refs/tags/v1.8.1.tar.gz tar -zxvf v1.8.1.tar.gz cd v1.8.1 # 过滤出镜像，注意需要手动做下排查 kustomize build example |grep &#39;image: &#39;|awk &#39;$2 != &#34;&#34; { print $2}&#39; |sort -u # 下载镜像，并push到dockerhub &#34;for i in `cat images.txt`; do docker pull $i ;tag_w=`echo &#34;$i&#34; | sed &#39;s/\\//_/g&#39;`;tag_new=&#34;williamyang1/kubeflow_$tag_w&#34;;docker tag $i $tag_new ;docker push $tag_new ;docker rmi $tag_new $i;echo &#34;$tag_new&#34; &gt;&gt; n_images.txt; done&#34; 最终的镜像列表\n">
+<meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2025-03-11T08:38:25&#43;00:00'/><meta property='article:modified_time' content='2025-03-11T08:38:25&#43;00:00'/>
+<meta name="twitter:title" content="构建指定cuda版本的vllm镜像">
+<meta name="twitter:description" content="构建指定cuda版本的vllm镜像">
     </head>
     <body class="
     article-page
@@ -309,9 +309,10 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#下载镜像">下载镜像</a></li>
-    <li><a href="#安装k8s">安装k8s</a></li>
-    <li><a href="#安装kubeflow">安装kubeflow</a></li>
+    <li><a href="#1-准备基础镜像">1. 准备基础镜像</a></li>
+    <li><a href="#2-同步基础镜像到国内镜像仓库可选如果具备外网服务器或可访问官方的镜像仓库可不做">2. 同步基础镜像到国内镜像仓库（可选，如果具备外网服务器或可访问官方的镜像仓库，可不做）</a></li>
+    <li><a href="#3--准备dockerfile">3.  准备Dockerfile</a></li>
+    <li><a href="#4-打镜像并推送">4. 打镜像并推送</a></li>
   </ol>
 </nav>
         </div>
@@ -331,7 +332,7 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/ai/kubeflow%E5%AE%89%E8%A3%85/">Kubeflow 安装</a>
+            <a href="/ai/%E6%9E%84%E5%BB%BA%E6%8C%87%E5%AE%9Acuda%E7%89%88%E6%9C%AC%E7%9A%84vllm%E9%95%9C%E5%83%8F/">构建指定cuda版本的vllm镜像</a>
         </h2>
     
         
@@ -353,7 +354,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">May 11, 2024</time>
+                <time class="article-time--published">Mar 11, 2025</time>
             </div>
         
 
@@ -368,7 +369,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 2 分钟
+                    阅读时长: 3 分钟
                 </time>
             </div>
         
@@ -383,46 +384,151 @@
     <section class="article-content">
     
     
-    <p><a class="link" href="https://blog.csdn.net/qq836825331/article/details/136846624"  target="_blank" rel="noopener"
-    >https://blog.csdn.net/qq836825331/article/details/136846624</a></p>
-<h2 id="下载镜像">下载镜像
-</h2><ul>
-<li>Kustomize安装</li>
+    <h2 id="1-准备基础镜像">1. 准备基础镜像
+</h2><p>一般情况，可以参考：[GitHub Action] 自动化创建，vllm构建过程所需的磁盘和内存资源较大，github action提供的免费资源不足（4c16g,14 ssd）会导致镜像构建失败。需要使用自己的服务器</p>
+<p>参考https://github.com/vllm-project/vllm/blob/main/Dockerfile</p>
+<p>可知，所需的基础镜像如下：
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/a9367bd058d430b3ef07338881c8e17c4e2619c6c623454fe3f503575c5f98ac.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 0"
+	
+	
+></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/b97745b0bb88c293f78c40a4b1587e8615ec2cedf57caaef4b9574d64312bb9d.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 1"
+	
+	
+></p>
+<p>如目标cuda版本为12.1.1,则需要的基础镜像为：</p>
+<p>nvidia/cuda:12.1.1-devel-ubuntu20.04</p>
+<p>nvidia/cuda:12.1.1-devel-ubuntu22.04</p>
+<ul>
+<li>查询该镜像是否存在</li>
 </ul>
+<p><a class="link" href="https://explore.ggcr.dev/"  target="_blank" rel="noopener"
+    >https://explore.ggcr.dev/</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/fd68b6d29b82a899f11fa1901e8588378fe588735e153ea30241b68b4c71dc93.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 3"
+	
+	
+></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/e468cae4555a243b1cddc85df909919b6c5a11e4ed5fc8cfc35bf0e4f8c10397.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 5"
+	
+	
+></p>
+<p>以上镜像组合式存在的。如果不存在，可在该网站查询相近的镜像组合</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/7e9556c39e38ad742ed27a11994eb1b5694cc15b15c70306d903817d845c373f.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 6"
+	
+	
+></p>
+<p>如镜像列表：<a class="link" href="https://explore.ggcr.dev/?repo=nvidia%2Fcuda"  target="_blank" rel="noopener"
+    >https://explore.ggcr.dev/?repo=nvidia%2Fcuda</a></p>
+<p>如找不到目标基础镜像或相邻镜像也不满足要求，可以考虑构建自己的基础镜像，见nvidia/cuda代码库：<a class="link" href="https://gitlab.com/nvidia/container-images/cuda"  target="_blank" rel="noopener"
+    >https://gitlab.com/nvidia/container-images/cuda</a>  。 这里暂不展开</p>
+<h2 id="2-同步基础镜像到国内镜像仓库可选如果具备外网服务器或可访问官方的镜像仓库可不做">2. 同步基础镜像到国内镜像仓库（可选，如果具备外网服务器或可访问官方的镜像仓库，可不做）
+</h2><p>使用github工作流自动同步：</p>
+<ul>
+<li>
+<p>所有工作流yaml:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">curl -s &#34;https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh&#34;  | bash
-</span></span><span class="line"><span class="cl">chmod +x kustomize &amp;&amp; mv kustomize /usr/local/bin/
-</span></span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># 工作流名称</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Sync-Images-to-Aliyun-CR</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 工作流运行时显示名称</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">run-name</span><span class="p">:</span><span class="w"> </span><span class="l">${{ github.actor }} is Sync Images to  Aliyun CR.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 怎样触发工作流</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">on</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">push</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&#34;main&#34;</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># Allows you to run this workflow manually from the Actions tab</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">workflow_dispatch</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 工作流程任务（通常含有一个或多个步骤）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">jobs</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">syncimages</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Checkout Repos</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Login to Aliyun CR</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">docker/login-action@v3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="l">${{ vars.ALY_REGISTRY}}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.ALY_UNAME }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.ALY_PASSWD }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">logout</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/setup-python@v5</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;3.10&#39;</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">python scrips/pull_image.py   </span><span class="w">
+</span></span></span></code></pre></td></tr></table>
 </div>
-</div><ul>
-<li>下载镜像</li>
+</div></li>
+<li>
+<p>对应处理镜像代码：</p>
+</li>
 </ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">wget https://github.com/kubeflow/manifests/archive/refs/tags/v1.8.1.tar.gz
-</span></span><span class="line"><span class="cl">tar -zxvf v1.8.1.tar.gz
-</span></span><span class="line"><span class="cl">cd v1.8.1
-</span></span><span class="line"><span class="cl"># 过滤出镜像，注意需要手动做下排查
-</span></span><span class="line"><span class="cl">kustomize build example |grep &#39;image: &#39;|awk &#39;$2 != &#34;&#34; { print $2}&#39; |sort -u 
-</span></span><span class="line"><span class="cl"># 下载镜像，并push到dockerhub
-</span></span><span class="line"><span class="cl">&#34;for i in `cat images.txt`; do docker pull $i ;tag_w=`echo &#34;$i&#34; | sed &#39;s/\//_/g&#39;`;tag_new=&#34;williamyang1/kubeflow_$tag_w&#34;;docker tag $i  $tag_new ;docker push $tag_new ;docker rmi $tag_new $i;echo &#34;$tag_new&#34; &gt;&gt; n_images.txt; done&#34;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>最终的镜像列表</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -464,134 +570,64 @@
 </span><span class="lnt">37
 </span><span class="lnt">38
 </span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span><span class="lnt">71
-</span><span class="lnt">72
-</span><span class="lnt">73
-</span><span class="lnt">74
-</span><span class="lnt">75
-</span><span class="lnt">76
-</span><span class="lnt">77
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">williamyang1/busybox:1.28
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_istio_pilot:1.17.5
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_istio_proxyv2:1.17.5
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_earlystopping-medianstop:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_enas-cnn-cifar10-cpu:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_file-metrics-collector:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_katib-controller:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_katib-db-manager:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_katib-ui:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_mxnet-mnist:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_pytorch-mnist-cpu:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-darts:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-enas:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-goptuna:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-hyperband:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-hyperopt:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-optuna:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-pbt:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_suggestion-skopt:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowkatib_tfevent-metrics-collector:v0.16.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflowmanifestswg_oidc-authservice:e236439
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_centraldashboard:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_jupyter-web-app:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_kfam:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_notebook-controller:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_poddefaults-webhook:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_profile-controller:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_pvcviewer-controller:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_tensorboard-controller:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_tensorboards-web-app:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_kubeflownotebookswg_volumes-web-app:v1.8.0
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_metacontrollerio_metacontroller:v2.0.4
-</span></span><span class="line"><span class="cl">williamyang1/docker.io_seldonio_mlserver:1.3.2
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_eventing_cmd_controller@sha256:92967bab4ad8f7d55ce3a77ba8868f3f2ce173c010958c28b9a690964ad6ee9b
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_eventing_cmd_mtping@sha256:6d35cc98baa098fc0c5b4290859e363a8350a9dadc31d1191b0b5c9796958223
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_eventing_cmd_webhook@sha256:ebf93652f0254ac56600bedf4a7d81611b3e1e7f6526c6998da5dd24cdc67ee1
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_net-istio_cmd_controller@sha256:421aa67057240fa0c56ebf2c6e5b482a12842005805c46e067129402d1751220
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_net-istio_cmd_webhook@sha256:bfa1dfea77aff6dfa7959f4822d8e61c4f7933053874cd3f27352323e6ecd985
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_activator@sha256:c2994c2b6c2c7f38ad1b85c71789bf1753cc8979926423c83231e62258837cb9
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_autoscaler@sha256:8319aa662b4912e8175018bd7cc90c63838562a27515197b803bdcd5634c7007
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_controller@sha256:98a2cc7fd62ee95e137116504e7166c32c65efef42c3d1454630780410abf943
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_domain-mapping@sha256:f66c41ad7a73f5d4f4bdfec4294d5459c477f09f3ce52934d1a215e32316b59b
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_domain-mapping-webhook@sha256:7368aaddf2be8d8784dc7195f5bc272ecfe49d429697f48de0ddc44f278167aa
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_queue@sha256:dabaecec38860ca4c972e6821d5dc825549faf50c6feb8feb4c04802f2338b8a
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_knative-releases_knative.dev_serving_cmd_webhook@sha256:4305209ce498caf783f39c8f3e85dfa635ece6947033bf50b0b627983fd65953
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_kubebuilder_kube-rbac-proxy:v0.13.1
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_kubebuilder_kube-rbac-proxy:v0.8.0
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_api-server:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_cache-server:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_frontend
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_frontend:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_metadata-writer:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_minio:RELEASE.2019-08-14T20-37-41Z-license-compliance
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_mysql:8.0.26
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_persistenceagent:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_scheduledworkflow:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_viewer-crd-controller:2.0.5
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_visualization-server
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_ml-pipeline_workflow-controller:v3.3.10-license-compliance
-</span></span><span class="line"><span class="cl">williamyang1/gcr.io_tfx-oss-public_ml_metadata_store_server:1.14.0
-</span></span><span class="line"><span class="cl">williamyang1/ghcr.io_dexidp_dex:v2.36.0
-</span></span><span class="line"><span class="cl">williamyang1/kserve_kserve-controller:v0.11.2
-</span></span><span class="line"><span class="cl">williamyang1/kserve_lgbserver:v0.11.2
-</span></span><span class="line"><span class="cl">williamyang1/kserve_models-web-app:v0.10.0
-</span></span><span class="line"><span class="cl">williamyang1/kserve_paddleserver:v0.11.2
-</span></span><span class="line"><span class="cl">williamyang1/kserve_pmmlserver:v0.11.2
-</span></span><span class="line"><span class="cl">williamyang1/kserve_sklearnserver:v0.11.2
-</span></span><span class="line"><span class="cl">williamyang1/kserve_xgbserver:v0.11.2
-</span></span><span class="line"><span class="cl">williamyang1/kubeflow_training-operator:v1-855e096
-</span></span><span class="line"><span class="cl">williamyang1/mysql:8.0.29
-</span></span><span class="line"><span class="cl">williamyang1/nvcr.io_nvidia_tritonserver:23.05-py3
-</span></span><span class="line"><span class="cl">williamyang1/python:3.7
-</span></span><span class="line"><span class="cl">williamyang1/pytorch_torchserve-kfs:0.8.2
-</span></span><span class="line"><span class="cl">williamyang1/quay.io_jetstack_cert-manager-cainjector:v1.12.2
-</span></span><span class="line"><span class="cl">williamyang1/quay.io_jetstack_cert-manager-controller:v1.12.2
-</span></span><span class="line"><span class="cl">williamyang1/quay.io_jetstack_cert-manager-webhook:v1.12.2
-</span></span><span class="line"><span class="cl">williamyang1/tensorflow_serving:2.6.2
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># -*- coding: utf-8 -*-</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span><span class="nn">re</span><span class="o">,</span><span class="nn">subprocess</span><span class="o">,</span><span class="nn">datetime</span><span class="o">,</span><span class="nn">json</span>
+</span></span><span class="line"><span class="cl"><span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">rs</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">ds_reg</span> <span class="o">=</span> <span class="s1">&#39;registry.cn-hangzhou.aliyuncs.com/reg_pub/&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;images.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># ims = re.split(&#39;\s+&#39;, img)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># p =None</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># if len(ims) &gt; 1 and len(ims[1]) &gt; 0:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#     p = ims[1]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ims</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds_reg</span> <span class="o">+</span> <span class="n">ims</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">        <span class="n">cmds</span> <span class="o">=</span> <span class="s1">&#39;skopeo copy --all docker://&#39;</span> <span class="o">+</span> <span class="n">img</span> <span class="o">+</span> <span class="s1">&#39; docker://&#39;</span> <span class="o">+</span> <span class="n">ds</span>
+</span></span><span class="line"><span class="cl">        <span class="n">code</span><span class="p">,</span><span class="n">rss</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">getstatusoutput</span><span class="p">(</span><span class="n">cmds</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">*</span><span class="mi">20</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="s2">&#34;copy </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">ds</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s2">&#34;rs:</span><span class="se">\n</span><span class="s2"> code:</span><span class="si">{}</span><span class="se">\n</span><span class="s2"> rs:</span><span class="si">{}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">rss</span><span class="p">)</span>  <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">cmds</span> <span class="o">=</span> <span class="s1">&#39;docker pull &#39;</span> <span class="o">+</span> <span class="n">img</span> <span class="o">+</span> <span class="s1">&#39; &amp;&amp; docker tag &#39;</span> <span class="o">+</span> <span class="n">img</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">ds</span> <span class="o">+</span> <span class="s1">&#39; &amp;&amp; docker push  &#39;</span> <span class="o">+</span> <span class="n">ds</span> <span class="o">+</span> <span class="s1">&#39; &amp;&amp; docker rmi </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">ds</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">code</span><span class="p">,</span><span class="n">rss</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">getstatusoutput</span><span class="p">(</span><span class="n">cmds</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;skopeo copy error, try docker pull and push:&#39;</span> <span class="o">+</span> <span class="s2">&#34;</span><span class="se">\n</span><span class="s2">&#34;</span> <span class="o">+</span> <span class="n">cmds</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s2">&#34;rs:</span><span class="se">\n</span><span class="s2"> code:</span><span class="si">{}</span><span class="se">\n</span><span class="s2"> rs:</span><span class="si">{}</span><span class="s2">&#34;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">rss</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      
+</span></span><span class="line"><span class="cl">        <span class="n">r</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;src&#39;</span><span class="p">:</span> <span class="n">img</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;ds&#39;</span><span class="p">:</span> <span class="n">ds</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="n">code</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;rs&#39;</span><span class="p">:</span> <span class="n">rss</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">rs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">ctime</span> <span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">-%H:%M:%S&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;result-</span><span class="si">{}</span><span class="s1">.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ctime</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="安装k8s">安装k8s
-</h2><ol>
-<li>Kubesphere 安装k8s&ndash;v1.27.10</li>
-</ol>
-<p><a class="link" href="https://kubesphere.io/zh/docs/v3.4/quick-start/all-in-one-on-linux/"  target="_blank" rel="noopener"
-    >https://kubesphere.io/zh/docs/v3.4/quick-start/all-in-one-on-linux/</a></p>
-<p><a class="link" href="https://kubesphere.io/zh/blogs/using-kubekey-deploy-k8s-v1.28.8/"  target="_blank" rel="noopener"
-    >https://kubesphere.io/zh/blogs/using-kubekey-deploy-k8s-v1.28.8/</a></p>
-<div class="highlight"><div class="chroma">
+</div><ul>
+<li>镜像同步代码仓库结构：</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/62b20e23dfe18cd1a967067dc1787e6c3c81f3fb86fbdf1b9c40b9691ab4fbdc.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 7"
+	
+	
+></p>
+<h2 id="3--准备dockerfile">3.  准备Dockerfile
+</h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
@@ -617,48 +653,71 @@
 </span><span class="lnt">22
 </span><span class="lnt">23
 </span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="c1"># 安装基础软件</span>
-</span></span><span class="line"><span class="cl"><span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">socat</span> <span class="n">conntrack</span> <span class="n">ebtables</span> <span class="n">ipset</span> <span class="n">ipvsadm</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 安装工具</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># shell安装 或者离线下载</span>
-</span></span><span class="line"><span class="cl"><span class="n">curl</span> <span class="o">-</span><span class="n">sfL</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">get</span><span class="o">-</span><span class="n">kk</span><span class="o">.</span><span class="n">kubesphere</span><span class="o">.</span><span class="n">io</span> <span class="o">|</span>  <span class="n">sh</span> <span class="o">-</span>
-</span></span><span class="line"><span class="cl"><span class="c1">## 离线下载</span>
-</span></span><span class="line"><span class="cl"><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">kubesphere</span><span class="o">/</span><span class="n">kubekey</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">v3</span><span class="o">.</span><span class="mf">1.1</span><span class="o">/</span><span class="n">kubekey</span><span class="o">-</span><span class="n">v3</span><span class="o">.</span><span class="mf">1.1</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">amd64</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-</span></span><span class="line"><span class="cl"><span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="n">kk</span>
-</span></span><span class="line"><span class="cl"><span class="n">mv</span> <span class="n">kk</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 确认是否包含想要安装的版本</span>
-</span></span><span class="line"><span class="cl"><span class="n">kk</span> <span class="n">version</span> <span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">supported</span><span class="o">-</span><span class="n">k8s</span>
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 注意确认镜像中的操作系统版本+cuda版本是否存在，查看：https://explore.ggcr.dev/?repo=nvidia%2Fcuda</span>
+</span></span><span class="line"><span class="cl">FROM nvidia/cuda:12.1.1-devel-ubuntu22.04 AS vllm-base
+</span></span><span class="line"><span class="cl"><span class="c1"># cuda版本：vllm目前只支持cuda 12.4、12.1、11.8 其他版本需要自己编译</span>
+</span></span><span class="line"><span class="cl">ARG <span class="nv">CUDA_VERSION</span><span class="o">=</span><span class="m">121</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 创建manifest 导出供离线下载使用</span>
-</span></span><span class="line"><span class="cl"><span class="n">kk</span> <span class="n">create</span> <span class="n">manifest</span> <span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">kubernetes</span> <span class="n">v1</span><span class="o">.</span><span class="mi">27</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 下载基础环境镜像-manifest用到的工具，单独下载--可选</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 镜像所在地址</span>
-</span></span><span class="line"><span class="cl"><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">kubesphere</span><span class="o">/</span><span class="n">kubekey</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">tag</span><span class="o">/</span><span class="n">v3</span><span class="o">.</span><span class="mf">1.1</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 找一台访问速度快的机器下载</span>
-</span></span><span class="line"><span class="cl"><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">kubesphere</span><span class="o">/</span><span class="n">kubekey</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">v3</span><span class="o">.</span><span class="mf">1.1</span><span class="o">/</span><span class="n">centos7</span><span class="o">-</span><span class="n">rpms</span><span class="o">-</span><span class="n">amd64</span><span class="o">.</span><span class="n">iso</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 这一步骤会下载manifest-sample.yaml中涉及的的工具如kubelet/containerd/helm等</span>
-</span></span><span class="line"><span class="cl"><span class="o">./</span><span class="n">kk</span> <span class="n">artifact</span> <span class="k">export</span> <span class="o">-</span><span class="n">m</span> <span class="n">manifest</span><span class="o">-</span><span class="n">sample</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">o</span> <span class="n">kubesphere</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># vllm版本</span>
+</span></span><span class="line"><span class="cl">ARG <span class="nv">VLLM_VERSION</span><span class="o">=</span>0.8.1 
+</span></span><span class="line"><span class="cl"><span class="c1"># 防止需要交互卡主打包过程</span>
+</span></span><span class="line"><span class="cl">ENV <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 此步骤为方便没有外网的机器创建集群。</span>
-</span></span><span class="line"><span class="cl"><span class="o">./</span><span class="n">kk</span> <span class="n">create</span> <span class="n">cluster</span> <span class="o">-</span><span class="n">f</span> <span class="n">config</span><span class="o">-</span><span class="n">sample</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">a</span> <span class="n">kubesphere</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span> <span class="o">--</span><span class="n">with</span><span class="o">-</span><span class="n">packages</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 更新环境</span>
+</span></span><span class="line"><span class="cl">RUN  apt update <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>apt install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev libbz2-dev liblzma-dev tk-dev wget
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 安装python，如需变更python版本这里调整</span>
+</span></span><span class="line"><span class="cl">RUN wget https://www.python.org/ftp/python/3.12.9/Python-3.12.9.tgz <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>tar -zxvf Python-3.12.9.tgz <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="nb">cd</span> Python-3.12.9  <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>./configure --enable-optimizations --prefix<span class="o">=</span>/usr/local/python3.12  <span class="o">&amp;&amp;</span> make -j<span class="k">$(</span>nproc<span class="k">)</span>    <span class="o">&amp;&amp;</span>  <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>make altinstall  <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>ln -s /usr/local/python3.12/bin/python3.12 /usr/bin/python3 <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>ln -s /usr/local/python3.12/bin/pip3.12 /usr/bin/pip3  <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>ln -s /usr/local/python3.12/bin/pip3.12 /usr/bin/pip  <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>rm -rf Python-3.12.9.tgz Python-3.12.9 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置PATH</span>
+</span></span><span class="line"><span class="cl">ENV <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;/usr/bin:/usr/local/python3.12/bin:</span><span class="nv">$PATH</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 安装vllm,注意所需版本，如无合适的whl需要考虑自己编译源码</span>
+</span></span><span class="line"><span class="cl">RUN wget https://github.com/vllm-project/vllm/releases/download/v<span class="si">${</span><span class="nv">VLLM_VERSION</span><span class="si">}</span>/vllm-<span class="si">${</span><span class="nv">VLLM_VERSION</span><span class="si">}</span>+cu<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="si">}</span>-cp38-abi3-manylinux1_x86_64.whl 
+</span></span><span class="line"><span class="cl">RUN pip install vllm-<span class="si">${</span><span class="nv">VLLM_VERSION</span><span class="si">}</span>+cu<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="si">}</span>-cp38-abi3-manylinux1_x86_64.whl   --extra-index-url https://download.pytorch.org/whl/cu<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="si">}</span>
+</span></span><span class="line"><span class="cl">RUN rm -f vllm-<span class="si">${</span><span class="nv">VLLM_VERSION</span><span class="si">}</span>+cu<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="si">}</span>-cp38-abi3-manylinux1_x86_64.whl 
+</span></span><span class="line"><span class="cl">ENTRYPOINT <span class="o">[</span><span class="s2">&#34;python3&#34;</span>, <span class="s2">&#34;-m&#34;</span>, <span class="s2">&#34;vllm.entrypoints.openai.api_server&#34;</span><span class="o">]</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="安装kubeflow">安装kubeflow
-</h2><p><a class="link" href="https://github.com/kubeflow/manifests"  target="_blank" rel="noopener"
-    >https://github.com/kubeflow/manifests</a></p>
+</div><p>﻿</p>
+<h2 id="4-打镜像并推送">4. 打镜像并推送
+</h2><p>核心命令如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
+</span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 下载镜像
-</span></span><span class="line"><span class="cl">for i in `cat images.txt`; do ctr imgaes pull $i ;done
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">docker build  --tag vllm/vllm-openai  .  <span class="c1"># 如服务器配置较高，可以使用该参数--build-arg max_jobs=8 --build-arg nvcc_threads=2  或针对性调整，如资一般，不建议使用</span>
+</span></span><span class="line"><span class="cl">docker tag vllm/vllm-openai registry.cn-hangzhou.aliyuncs.com/reg_pub/vllm_vllm-openai:cuda-12.1.1-20250320
+</span></span><span class="line"><span class="cl">docker push registry.cn-hangzhou.aliyuncs.com/reg_pub/vllm_vllm-openai:cuda-12.1.1-20250320
 </span></span></code></pre></td></tr></table>
 </div>
-</div>
+</div><p>﻿</p>
+<p>﻿</p>
+<p>﻿</p>
+
 </section>
 
 

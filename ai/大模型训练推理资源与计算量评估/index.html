@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="计算量评估 前馈神经网络计算量 前馈神经网络：Y = XW +B 在这个过程中，完成的运算如下： $$ \\begin{bmatrix} x_0 &amp; x_1 &amp; x_2 \\end{bmatrix} \\times \\begin{bmatrix} w_{00} &amp; w_{01} \\ w_{10} &amp; w_{11} \\ w_{20} &amp; w_{21} \\end{bmatrix} + \\begin{bmatrix} b_0 \\ b_1 \\end{bmatrix} $$ 其中，W是权重矩阵，X是输入向量，B是偏置项。即： $$ y = \\begin{bmatrix} y_0 \\ y_1 \\end{bmatrix} \\begin{matrix} y_0 = w_{00}x_0 + w_{01}x_1 + b_0\\ y_1 = w_{10}x_0 + w_{11}x_1 + b_1\\ \\end{matrix} $$ 上">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="计算量评估 前馈神经网络计算量 前馈神经网络：Y = XW +B\n在这个过程中，完成的运算如下：\n$$ \\begin{bmatrix} x_0 &amp; x_1 &amp; x_2 \\end{bmatrix} \\times \\begin{bmatrix} w_{00} &amp; w_{01} \\ w_{10} &amp; w_{11} \\ w_{20} &amp; w_{21} \\end{bmatrix} + \\begin{bmatrix} b_0 \\ b_1 \\end{bmatrix} $$\n其中，W是权重矩阵，X是输入向量，B是偏置项。即：\n$$ y = \\begin{bmatrix} y_0 \\ y_1 \\end{bmatrix} \\begin{matrix} y_0 = w_{00}x_0 + w_{01}x_1 + b_0\\ y_1 = w_{10}x_0 + w_{11}x_1 + b_1\\\n\\end{matrix} $$\n上述2个公式中，每个公式都有3个加法、3个乘法计算。所以[1,3]的矩阵和[3,2]的矩阵相乘共包含 2132 =12 次浮点计算量(称为FLOPs)。从而推广到一般：[m,k]的矩阵和[k,n]的矩阵相乘，需要2mkn FLOPs。而GPU在不同精度单位下，浮点数运算的效率是不同的。例如，A100在16位精度(FP16或BF16)下每秒可以进行$31410^{12}$次浮点运算。而在32位精度下，每秒只能进行$15610^{12}$次浮点运算。所以，我们可以理所当然的想到一个提速思路 - 让所有运算在低精度下进行来提高训练/推理效率。但是，这里有个无法忽略的问题：某些计算必须要在高精度下进行。例如全程在低精度下进行模型训练，往往会出现由于精度不够导致数值溢出和无法收敛的问题。所以目前大模型训练通常采用的是混合精度方式进行：前向传播、反向传播这些无需高精度的计算采用16位精度(FP16或BF16)进行，优化器状态更新在32位精度(FP32)进行。而模型推理的要求就比较低，可以在16位、8位甚至4位精度进行，整个任务的计算效率非常高。\n">
 <title>大模型训练推理资源与计算量评估</title>
 
-<link rel='canonical' href='http://localhost:1313/ai/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%8E%A8%E7%90%86%E8%B5%84%E6%BA%90%E4%B8%8E%E8%AE%A1%E7%AE%97%E9%87%8F%E8%AF%84%E4%BC%B0/'>
+<link rel='canonical' href='https://blog.liu-nian.top/ai/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%8E%A8%E7%90%86%E8%B5%84%E6%BA%90%E4%B8%8E%E8%AE%A1%E7%AE%97%E9%87%8F%E8%AF%84%E4%BC%B0/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="大模型训练推理资源与计算量评估">
-<meta property='og:description' content="计算量评估 前馈神经网络计算量 前馈神经网络：Y = XW +B 在这个过程中，完成的运算如下： $$ \\begin{bmatrix} x_0 &amp; x_1 &amp; x_2 \\end{bmatrix} \\times \\begin{bmatrix} w_{00} &amp; w_{01} \\ w_{10} &amp; w_{11} \\ w_{20} &amp; w_{21} \\end{bmatrix} + \\begin{bmatrix} b_0 \\ b_1 \\end{bmatrix} $$ 其中，W是权重矩阵，X是输入向量，B是偏置项。即： $$ y = \\begin{bmatrix} y_0 \\ y_1 \\end{bmatrix} \\begin{matrix} y_0 = w_{00}x_0 + w_{01}x_1 + b_0\\ y_1 = w_{10}x_0 + w_{11}x_1 + b_1\\ \\end{matrix} $$ 上">
-<meta property='og:url' content='http://localhost:1313/ai/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%8E%A8%E7%90%86%E8%B5%84%E6%BA%90%E4%B8%8E%E8%AE%A1%E7%AE%97%E9%87%8F%E8%AF%84%E4%BC%B0/'>
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="大模型训练推理资源与计算量评估">
+<meta property='og:description' content="计算量评估 前馈神经网络计算量 前馈神经网络：Y = XW +B\n在这个过程中，完成的运算如下：\n$$ \\begin{bmatrix} x_0 &amp; x_1 &amp; x_2 \\end{bmatrix} \\times \\begin{bmatrix} w_{00} &amp; w_{01} \\ w_{10} &amp; w_{11} \\ w_{20} &amp; w_{21} \\end{bmatrix} + \\begin{bmatrix} b_0 \\ b_1 \\end{bmatrix} $$\n其中，W是权重矩阵，X是输入向量，B是偏置项。即：\n$$ y = \\begin{bmatrix} y_0 \\ y_1 \\end{bmatrix} \\begin{matrix} y_0 = w_{00}x_0 + w_{01}x_1 + b_0\\ y_1 = w_{10}x_0 + w_{11}x_1 + b_1\\\n\\end{matrix} $$\n上述2个公式中，每个公式都有3个加法、3个乘法计算。所以[1,3]的矩阵和[3,2]的矩阵相乘共包含 2132 =12 次浮点计算量(称为FLOPs)。从而推广到一般：[m,k]的矩阵和[k,n]的矩阵相乘，需要2mkn FLOPs。而GPU在不同精度单位下，浮点数运算的效率是不同的。例如，A100在16位精度(FP16或BF16)下每秒可以进行$31410^{12}$次浮点运算。而在32位精度下，每秒只能进行$15610^{12}$次浮点运算。所以，我们可以理所当然的想到一个提速思路 - 让所有运算在低精度下进行来提高训练/推理效率。但是，这里有个无法忽略的问题：某些计算必须要在高精度下进行。例如全程在低精度下进行模型训练，往往会出现由于精度不够导致数值溢出和无法收敛的问题。所以目前大模型训练通常采用的是混合精度方式进行：前向传播、反向传播这些无需高精度的计算采用16位精度(FP16或BF16)进行，优化器状态更新在32位精度(FP32)进行。而模型推理的要求就比较低，可以在16位、8位甚至4位精度进行，整个任务的计算效率非常高。\n">
+<meta property='og:url' content='https://blog.liu-nian.top/ai/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83%E6%8E%A8%E7%90%86%E8%B5%84%E6%BA%90%E4%B8%8E%E8%AE%A1%E7%AE%97%E9%87%8F%E8%AF%84%E4%BC%B0/'>
 <meta property='og:site_name' content='流年'>
 <meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2025-02-19T08:38:25&#43;00:00'/><meta property='article:modified_time' content='2025-02-19T08:38:25&#43;00:00'/>
 <meta name="twitter:title" content="大模型训练推理资源与计算量评估">
-<meta name="twitter:description" content="计算量评估 前馈神经网络计算量 前馈神经网络：Y = XW +B 在这个过程中，完成的运算如下： $$ \\begin{bmatrix} x_0 &amp; x_1 &amp; x_2 \\end{bmatrix} \\times \\begin{bmatrix} w_{00} &amp; w_{01} \\ w_{10} &amp; w_{11} \\ w_{20} &amp; w_{21} \\end{bmatrix} + \\begin{bmatrix} b_0 \\ b_1 \\end{bmatrix} $$ 其中，W是权重矩阵，X是输入向量，B是偏置项。即： $$ y = \\begin{bmatrix} y_0 \\ y_1 \\end{bmatrix} \\begin{matrix} y_0 = w_{00}x_0 + w_{01}x_1 + b_0\\ y_1 = w_{10}x_0 + w_{11}x_1 + b_1\\ \\end{matrix} $$ 上">
-  
-
-
+<meta name="twitter:description" content="计算量评估 前馈神经网络计算量 前馈神经网络：Y = XW +B\n在这个过程中，完成的运算如下：\n$$ \\begin{bmatrix} x_0 &amp; x_1 &amp; x_2 \\end{bmatrix} \\times \\begin{bmatrix} w_{00} &amp; w_{01} \\ w_{10} &amp; w_{11} \\ w_{20} &amp; w_{21} \\end{bmatrix} + \\begin{bmatrix} b_0 \\ b_1 \\end{bmatrix} $$\n其中，W是权重矩阵，X是输入向量，B是偏置项。即：\n$$ y = \\begin{bmatrix} y_0 \\ y_1 \\end{bmatrix} \\begin{matrix} y_0 = w_{00}x_0 + w_{01}x_1 + b_0\\ y_1 = w_{10}x_0 + w_{11}x_1 + b_1\\\n\\end{matrix} $$\n上述2个公式中，每个公式都有3个加法、3个乘法计算。所以[1,3]的矩阵和[3,2]的矩阵相乘共包含 2132 =12 次浮点计算量(称为FLOPs)。从而推广到一般：[m,k]的矩阵和[k,n]的矩阵相乘，需要2mkn FLOPs。而GPU在不同精度单位下，浮点数运算的效率是不同的。例如，A100在16位精度(FP16或BF16)下每秒可以进行$31410^{12}$次浮点运算。而在32位精度下，每秒只能进行$15610^{12}$次浮点运算。所以，我们可以理所当然的想到一个提速思路 - 让所有运算在低精度下进行来提高训练/推理效率。但是，这里有个无法忽略的问题：某些计算必须要在高精度下进行。例如全程在低精度下进行模型训练，往往会出现由于精度不够导致数值溢出和无法收敛的问题。所以目前大模型训练通常采用的是混合精度方式进行：前向传播、反向传播这些无需高精度的计算采用16位精度(FP16或BF16)进行，优化器状态更新在32位精度(FP32)进行。而模型推理的要求就比较低，可以在16位、8位甚至4位精度进行，整个任务的计算效率非常高。\n">
     </head>
     <body class="
     article-page
@@ -59,7 +56,7 @@
                     
                     
                         
-                        <img src="/img/logo_hub36d4cf3c1d27a2d9b323f3396e3fa15_9925_300x0_resize_box_3.png" width="300"
+                        <img src="/img/logo_hu_fd3008965b65babe.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 
@@ -429,9 +426,9 @@ w_{20} &amp; w_{21}
 b_0 \
 b_1
 \end{bmatrix}
-$$
-其中，W是权重矩阵，X是输入向量，B是偏置项。即：
-$$
+$$</p>
+<p>其中，W是权重矩阵，X是输入向量，B是偏置项。即：</p>
+<p>$$
 y = \begin{bmatrix}
 y_0 \
 y_1
@@ -439,8 +436,8 @@ y_1
 \begin{matrix}
 y_0 = w_{00}x_0 + w_{01}x_1 + b_0\
 y_1 = w_{10}x_0 + w_{11}x_1 + b_1\<br>
-\end{matrix}</p>
-<p>$$</p>
+\end{matrix}
+$$</p>
 <p>上述2个公式中，每个公式都有3个加法、3个乘法计算。所以[1,3]的矩阵和[3,2]的矩阵相乘共包含 2<em>1</em>3<em>2 =12 次浮点计算量(称为FLOPs)。从而推广到一般：[m,k]的矩阵和[k,n]的矩阵相乘，需要2</em>m<em>k</em>n FLOPs。而GPU在不同精度单位下，浮点数运算的效率是不同的。例如，A100在16位精度(FP16或BF16)下每秒可以进行$314<em>10^{12}$次浮点运算。而在32位精度下，每秒只能进行$156</em>10^{12}$次浮点运算。所以，我们可以理所当然的想到一个提速思路 - 让所有运算在低精度下进行来提高训练/推理效率。但是，这里有个无法忽略的问题：某些计算必须要在高精度下进行。例如全程在低精度下进行模型训练，往往会出现由于精度不够导致数值溢出和无法收敛的问题。所以目前大模型训练通常采用的是混合精度方式进行：前向传播、反向传播这些无需高精度的计算采用16位精度(FP16或BF16)进行，优化器状态更新在32位精度(FP32)进行。而模型推理的要求就比较低，可以在16位、8位甚至4位精度进行，整个任务的计算效率非常高。</p>
 <h3 id="模型计算量分析">模型计算量分析
 </h3><p>$$
@@ -463,53 +460,56 @@ $$</p>
 	
 	
 ></p>
-<p><strong>QKV计算量：</strong>
-$$
+<p><strong>QKV计算量：</strong></p>
+<p>$$
 Q = XW^Q, K=XW^K, V=XW^V, 其中：
 x \in [B,s,h], W^Q\in[h,h/a]
-$$
-涉及计算量大致如下：
-$$3<em>2</em>B<em>s</em>h<em>h/a</em>a=6Bsh^2,其中a是多头注意力机制的head数。
 $$</p>
-<p><strong>注意力计算量</strong>：<br></p>
+<p>涉及计算量大致如下：</p>
+<p>$$
+3<em>2</em>B<em>s</em>h<em>h/a</em>a=6Bsh^2,其中a是多头注意力机制的head数。
+$$</p>
+<p><strong>注意力计算量</strong>：<code>&lt;br&gt;</code></p>
 <ol>
 <li>注意力分数计算
-单头注意力分数一般采用如下计算：
-$$
+单头注意力分数一般采用如下计算：</li>
+</ol>
+<p>$$
 attention = QK^T / \sqrt(d_k)
-$$
-计算量为：
-$$
-2B<em>s</em>h/a<em>s=2Bs^2h/a,其中Q \in [B,s,h/a], K^T \in[B,h/a,s]
-$$
-因此多头注意力分数整体计算量：
-$$
-2Bs^2h/a</em>a=2Bsh^2
-$$</li>
+$$</p>
+<p>计算量为：</p>
+<p>$$
+2B<em>s</em>h/a*s=2Bs^2h/a,其中Q \in [B,s,h/a], K^T \in[B,h/a,s]
+$$</p>
+<p>因此多头注意力分数整体计算量：</p>
+<p>$$
+2Bs^2h/a*a=2Bsh^2
+$$</p>
+<ol>
 <li>注意力输出层计算量：
 单头注意力输出层计算量：
-计算公式为：
-$$
-Z= attention \times V, 其中attention \in [B,s,s], V\in[B,s,h/a]
-$$
-计算量为：
-$$
-2B<em>s</em>s<em>h/a=2Bs^2h/a
-$$
-因此多头注意力输出层计算量为：$2Bs^2h/a</em>a=2Bs^2h$</li>
+计算公式为：</li>
 </ol>
-<p><strong>多头注意力合并层计算量</strong><br>
-计算公式为：
-$$
+<p>$$
+Z= attention \times V, 其中attention \in [B,s,s], V\in[B,s,h/a]
+$$</p>
+<p>计算量为：</p>
+<p>$$
+2B<em>s</em>s*h/a=2Bs^2h/a
+$$</p>
+<p>因此多头注意力输出层计算量为：$2Bs^2h/a*a=2Bs^2h$</p>
+<p><strong>多头注意力合并层计算量</strong><code>&lt;br&gt;</code>
+计算公式为：</p>
+<p>$$
 y = W^OZ + B \
 其中,Z\in[B,s,h], W^O \in [h, h], Z为多头注意力输出层结果拼接
-$$
-计算量为：
-$$
+$$</p>
+<p>计算量为：</p>
+<p>$$
 2B<em>s</em>h*h=2Bsh^2
-$$
-因此整个自注意力层的计算量为：
-$$
+$$</p>
+<p>因此整个自注意力层的计算量为：</p>
+<p>$$
 4Bs^2h+8Bsh^2
 $$</p>
 <h3 id="mlp层所需计算量">MLP层所需计算量
@@ -518,35 +518,35 @@ $$</p>
 <li>激活值和第二个线性层相乘：$[B,s,4h]*[4h,h] 共8Bsh^2$ FLOPs；</li>
 <li>激活层为约0FLOPs：GeLU是确定的数学缩放公式，可认为无需矩阵乘；</li>
 </ul>
-<p>单个MLP共有包含$16Bsh^2$$ FLOPs。<br>
+<p>单个MLP共有包含$16Bsh^2$$ FLOPs。<code>&lt;br&gt;</code>
 因此，l个transformer块的FLOPs为：$24Bsh^2+4Bs^2h$，所有transformer块的FLOPs为：$l(24Bsh^2+4Bs^2h)$。</p>
 <h3 id="其他结构所需计算量">其他结构所需计算量
-</h3><p>主要是最终输出层，计算公式为：
-$$
+</h3><p>主要是最终输出层，计算公式为：</p>
+<p>$$
 y = XW^O + B, 其中X\in[B,s,h], W^O \in [h,V], V为字典大小
-$$
-其计算量大小为：
-$$
-2B<em>s</em>h<em>V=2BsVh
-$$
-综上，整个模型的前向传播计算量为：
-$$
+$$</p>
+<p>其计算量大小为：</p>
+<p>$$
+2B<em>s</em>h*V=2BsVh
+$$</p>
+<p>综上，整个模型的前向传播计算量为：</p>
+<p>$$
 F_{前向传播} = l(24Bsh^2+4Bs^2h)+2BsVh \
 = 24Bsh^2l+4Bs^2hl+2BsVh \
 = 24Bsh^2l(1+\frac{s}{6h}+\frac{V}{12lh})
-$$
-而通常在大模型中，6h远大于s，12lh远大于V，所以还可以进一步简化：
-$$
+$$</p>
+<p>而通常在大模型中，6h远大于s，12lh远大于V，所以还可以进一步简化：</p>
+<p>$$
 F_{前向传播} = 24Bsh^2l
-$$
-因此可推断，训练与推理所需的计算量为：
-$$
+$$</p>
+<p>因此可推断，训练与推理所需的计算量为：</p>
+<p>$$
 F_{训练} = 3F_{前向传播} = 72Bsh^2l \
 F_{训练} = 4F_{前向传播} = 96Bsh^2l,全量参数计算时 \
 F_{推理} = F_{前向传播} = 24Bsh^2l
-$$
-粗略估算一般基于transformer的大模型的参数量为$12lh^2$,可以发现：
-1）模型训练中：如果没有应用激活值重计算，单模型副本处理每个tokens时，单参数上算力需求约为6FLOPs($\frac{72Bsh^2l}{12lh^2</em>B*s}$)。如果应用全激活值重计算，提升至8FLOPs；
+$$</p>
+<p>粗略估算一般基于transformer的大模型的参数量为$12lh^2$,可以发现：
+1）模型训练中：如果没有应用激活值重计算，单模型副本处理每个tokens时，单参数上算力需求约为6FLOPs($\frac{72Bsh^2l}{12lh^2<em>B</em>s}$)。如果应用全激活值重计算，提升至8FLOPs；
 2）模型推理中：单模型副本处理每个tokens时，单参数上算力需求约为6FLOPs；</p>
 <p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/b7530fd66541fc9ea2132a8dd205a7011dda6210ab3ac10ac39d42ed4cc6c04c.png"
 	
@@ -589,23 +589,21 @@ $$
 		alt="f048f9cb18ca409edeeb27e838ce9a011cf21bd80c82afa9ff3ca00fa33136ee"
 	
 	
-><br>
+>
 <a class="link" href="https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md#%E8%BD%AF%E7%A1%AC%E4%BB%B6%E4%BE%9D%E8%B5%96"  target="_blank" rel="noopener"
     >https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md#%E8%BD%AF%E7%A1%AC%E4%BB%B6%E4%BE%9D%E8%B5%96</a></p>
 <p>LLaMA Factory 微调所需的硬件资源计算主要基于<strong>模型参数量</strong>、<strong>微调方法</strong>和<strong>训练配置</strong>三个核心维度。以下是具体计算方法与典型场景示例：</p>
 <hr>
 <h3 id="一显存需求计算公式"><strong>一、显存需求计算公式</strong>
-</h3><p>显存占用（GB）主要包含以下部分：
-$$
+</h3><p>显存占用（GB）主要包含以下部分：</p>
+<p>$$
 \text{显存} = \text{模型参数显存} + \text{梯度显存} + \text{优化器状态显存} + \text{激活值显存}
 $$</p>
 <p><strong>1. 模型参数显存</strong></p>
 <ul>
-<li><strong>全参数微调（FP16）</strong>：参数量 × 2 bytes<br>
-（例如 7B 模型：7×10⁹ × 2 / 10⁹ = 14GB）</li>
-<li><strong>LoRA（FP16）</strong>：仅需存储低秩矩阵（约 0.1%-1% 参数量）<br>
-（例如 7B 模型：14GB × 1% ≈ 0.14GB）</li>
-<li><strong>QLoRA（4-bit）</strong>：参数量 × 0.5 bytes<br>
+<li><strong>全参数微调（FP16）</strong>：参数量 × 2 bytes（例如 7B 模型：7×10⁹ × 2 / 10⁹ = 14GB）</li>
+<li><strong>LoRA（FP16）</strong>：仅需存储低秩矩阵（约 0.1%-1% 参数量）（例如 7B 模型：14GB × 1% ≈ 0.14GB）</li>
+<li><strong>QLoRA（4-bit）</strong>：参数量 × 0.5 bytes
 （例如 7B 模型：7×10⁹ × 0.5 / 10⁹ = 3.5GB）</li>
 </ul>
 <p><strong>2. 梯度与优化器状态</strong></p>
@@ -613,53 +611,53 @@ $$</p>
 <li><strong>全参数微调（Adam优化器）</strong>：参数量 × 4 bytes（梯度+优化器状态）</li>
 <li><strong>LoRA/QLoRA</strong>：仅需存储少量梯度（可忽略）</li>
 </ul>
-<p><strong>3. 激活值显存</strong><br>
-与批次大小（batch size）和序列长度（seq_len）相关，计算公式：<br>
-$$
+<p><strong>3. 激活值显存</strong>
+与批次大小（batch size）和序列长度（seq_len）相关，计算公式：</p>
+<p>$$
 \text{激活值显存} \approx \text{batch_size} \times \text{seq_len} \times \text{hidden_dim} \times 2 \text{ bytes}
 $$</p>
 <hr>
 <h3 id="二典型场景硬件需求"><strong>二、典型场景硬件需求</strong>
 </h3><div class="table-wrapper"><table>
-<thead>
-<tr>
-<th>模型规模</th>
-<th>微调方法</th>
-<th>显存需求（估算）</th>
-<th>推荐 GPU 配置</th>
-<th>数据来源</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>7B</strong></td>
-<td>全参数（FP16）</td>
-<td>60GB</td>
-<td>2×A100 80GB</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>7B</strong></td>
-<td>QLoRA（4-bit）</td>
-<td>6GB</td>
-<td>单卡 RTX 3090/4090</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>13B</strong></td>
-<td>LoRA（FP16）</td>
-<td>12GB</td>
-<td>单卡 A100 40GB</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>70B</strong></td>
-<td>全参数（FP16）</td>
-<td>600GB</td>
-<td>8×H100 80GB（NVLink）</td>
-<td></td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>模型规模</th>
+          <th>微调方法</th>
+          <th>显存需求（估算）</th>
+          <th>推荐 GPU 配置</th>
+          <th>数据来源</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>7B</strong></td>
+          <td>全参数（FP16）</td>
+          <td>60GB</td>
+          <td>2×A100 80GB</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><strong>7B</strong></td>
+          <td>QLoRA（4-bit）</td>
+          <td>6GB</td>
+          <td>单卡 RTX 3090/4090</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><strong>13B</strong></td>
+          <td>LoRA（FP16）</td>
+          <td>12GB</td>
+          <td>单卡 A100 40GB</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><strong>70B</strong></td>
+          <td>全参数（FP16）</td>
+          <td>600GB</td>
+          <td>8×H100 80GB（NVLink）</td>
+          <td></td>
+      </tr>
+  </tbody>
 </table></div>
 <hr>
 <h3 id="三关键影响因素"><strong>三、关键影响因素</strong>
@@ -681,7 +679,7 @@ $$</p>
 </ul>
 </li>
 <li>
-<p><strong>分布式训练支持</strong><br>
+<p><strong>分布式训练支持</strong>
 LLaMA Factory 支持 DeepSpeed ZeRO 和模型并行，可将大模型拆分到多卡。</p>
 </li>
 </ol>
@@ -738,9 +736,11 @@ Total GPU Memory = 模型大小 + KV Cache + Memory Overhead
 <p><a class="link" href="https://medium.com/@manuelescobar-dev/memory-requirements-for-llm-training-and-inference-97e4ab08091b"  target="_blank" rel="noopener"
     >https://medium.com/@manuelescobar-dev/memory-requirements-for-llm-training-and-inference-97e4ab08091b</a></p>
 <h4 id="显存计算">显存计算
-</h4><p>推理显存评估：
-$$Total\ Inference\ Memory = Model Size + KV Cache + Activations $$
-模型大小：</p>
+</h4><p>推理显存评估：</p>
+<p>$$
+Total\ Inference\ Memory = Model Size + KV Cache + Activations
+$$</p>
+<p>模型大小：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/e21334b55e5c3e6692bf0d25103d42c561d602963061639d2981a314a86b2838.png"
 	
 	
@@ -751,18 +751,19 @@ $$Total\ Inference\ Memory = Model Size + KV Cache + Activations $$
 	
 	
 ></p>
-<p>kv cache：
-$$
+<p>kv cache：</p>
+<p>$$
 KV\ Cache =2 × Batch Size × Sequence Length × Number of Layers × Hidden Size × Precision
-$$
-激活值：
-$$
+$$</p>
+<p>激活值：</p>
+<p>$$
 Activation Memory = Batch Size × Sequence Length × Hidden Size × ( 34 + 5 × \frac{Sequence Length ×Number of attention heads}{Hidden Size})
-$$
-推理显存评估：</p>
-<p>$$Total Memory=Model Size+KV Cache+Activations+(Optimizer States+Gradients)× Number of Trainable Parameters
-$$
-Optimizer States
+$$</p>
+<p>推理显存评估：</p>
+<p>$$
+Total Memory=Model Size+KV Cache+Activations+(Optimizer States+Gradients)× Number of Trainable Parameters
+$$</p>
+<p>Optimizer States
 Optimization algorithms require resources to store the parameters and auxiliary variables. These variables include momentum and variance used by algorithms such as Adam (2 states) or SGD (1 state). The precision and type of optimizer affect memory usage.</p>
 <p>Formula [1]</p>
 <p>AdamW (2 states): 8 Bytes per parameter
@@ -920,7 +921,7 @@ Gradient values are computed during the backward pass of the model. They represe
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
-            </script><script type="text/javascript" src="/ts/main.aaeac44545d266267249952419e48a1186aba78a56bdb962b00495ea3a337cd9.js" defer></script>
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');

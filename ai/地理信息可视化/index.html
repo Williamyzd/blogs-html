@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="地理信息可视化">
 <title>地理信息可视化</title>
 
-<link rel='canonical' href='http://localhost:1313/ai/%E5%9C%B0%E7%90%86%E4%BF%A1%E6%81%AF%E5%8F%AF%E8%A7%86%E5%8C%96/'>
+<link rel='canonical' href='https://blog.liu-nian.top/ai/%E5%9C%B0%E7%90%86%E4%BF%A1%E6%81%AF%E5%8F%AF%E8%A7%86%E5%8C%96/'>
 
-<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="地理信息可视化">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="地理信息可视化">
 <meta property='og:description' content="地理信息可视化">
-<meta property='og:url' content='http://localhost:1313/ai/%E5%9C%B0%E7%90%86%E4%BF%A1%E6%81%AF%E5%8F%AF%E8%A7%86%E5%8C%96/'>
+<meta property='og:url' content='https://blog.liu-nian.top/ai/%E5%9C%B0%E7%90%86%E4%BF%A1%E6%81%AF%E5%8F%AF%E8%A7%86%E5%8C%96/'>
 <meta property='og:site_name' content='流年'>
 <meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2024-05-11T08:38:25&#43;00:00'/><meta property='article:modified_time' content='2024-05-11T08:38:25&#43;00:00'/>
 <meta name="twitter:title" content="地理信息可视化">
 <meta name="twitter:description" content="地理信息可视化">
-  
-
-
     </head>
     <body class="
     article-page
@@ -59,7 +56,7 @@
                     
                     
                         
-                        <img src="/img/logo_hub36d4cf3c1d27a2d9b323f3396e3fa15_9925_300x0_resize_box_3.png" width="300"
+                        <img src="/img/logo_hu_fd3008965b65babe.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 
@@ -405,68 +402,68 @@
 <li>WKT与GeoJSON分为点、线、面、几何集合四种：</li>
 </ul>
 <div class="table-wrapper"><table>
-<thead>
-<tr>
-<th style="text-align:center">点</th>
-<th style="text-align:center">线</th>
-<th style="text-align:center">面</th>
-<th style="text-align:center">组合</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">Point   MultiPoint</td>
-<td style="text-align:center">LineString   MultiLineString</td>
-<td style="text-align:center">Polygon   MultiPolygon</td>
-<td style="text-align:center">GeometryCollection</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center">点</th>
+          <th style="text-align: center">线</th>
+          <th style="text-align: center">面</th>
+          <th style="text-align: center">组合</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">Point   MultiPoint</td>
+          <td style="text-align: center">LineString   MultiLineString</td>
+          <td style="text-align: center">Polygon   MultiPolygon</td>
+          <td style="text-align: center">GeometryCollection</td>
+      </tr>
+  </tbody>
 </table></div>
 <div class="table-wrapper"><table>
-<thead>
-<tr>
-<th style="text-align:center">类型</th>
-<th style="text-align:center">WKT</th>
-<th style="text-align:center">GeoJSON</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">Point</td>
-<td style="text-align:center">POINT(10 10)</td>
-<td style="text-align:center">{ &ldquo;type&rdquo;:  &ldquo;Point&rdquo;, &ldquo;coordinates&rdquo;: [10, 10] }</td>
-</tr>
-<tr>
-<td style="text-align:center">LineString</td>
-<td style="text-align:center">LINESTRING(10 10, 20 30)</td>
-<td style="text-align:center">{ &ldquo;type&rdquo;:  &ldquo;Point&rdquo;, &ldquo;coordinates&rdquo;:[ [10, 10], [20, 30] ] }</td>
-</tr>
-<tr>
-<td style="text-align:center">Polygon</td>
-<td style="text-align:center">POLYGON(10 10, 15 16, 22 10, 30 32)</td>
-<td style="text-align:center">{ &ldquo;type&rdquo;:  &ldquo;Polygon&rdquo;, &ldquo;coordinates&rdquo;: [ [ [10, 10], [10, 10], [10, 10], [10, 10] ] ] }</td>
-</tr>
-<tr>
-<td style="text-align:center">MultiPoint</td>
-<td style="text-align:center">MULTIPOINT(*)</td>
-<td style="text-align:center">{ &ldquo;type&rdquo;:  &ldquo;MultiPoint&rdquo;, &ldquo;coordinates&rdquo;: [*] }</td>
-</tr>
-<tr>
-<td style="text-align:center">MultiLineString</td>
-<td style="text-align:center">MULTILINESTRING (*)</td>
-<td style="text-align:center">{ &ldquo;type&rdquo;:  &ldquo;MultiLineString&rdquo;, &ldquo;coordinates&rdquo;: [*] }</td>
-</tr>
-<tr>
-<td style="text-align:center">MultiPolygon</td>
-<td style="text-align:center">MULTIPOLYGON (*)</td>
-<td style="text-align:center">{ &ldquo;type&rdquo;:  &ldquo;MultiPolygon&rdquo;, &ldquo;coordinates&rdquo;: [*] }</td>
-</tr>
-<tr>
-<td style="text-align:center">GEOMETRYCOLLECTION</td>
-<td style="text-align:center">GEOMETRYCOLLECTION(POINT(2 3),LINESTRING(2 3,3 4))</td>
-<td style="text-align:center">-</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: center">类型</th>
+          <th style="text-align: center">WKT</th>
+          <th style="text-align: center">GeoJSON</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: center">Point</td>
+          <td style="text-align: center">POINT(10 10)</td>
+          <td style="text-align: center">{ &ldquo;type&rdquo;:  &ldquo;Point&rdquo;, &ldquo;coordinates&rdquo;: [10, 10] }</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">LineString</td>
+          <td style="text-align: center">LINESTRING(10 10, 20 30)</td>
+          <td style="text-align: center">{ &ldquo;type&rdquo;:  &ldquo;Point&rdquo;, &ldquo;coordinates&rdquo;:[ [10, 10], [20, 30] ] }</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">Polygon</td>
+          <td style="text-align: center">POLYGON(10 10, 15 16, 22 10, 30 32)</td>
+          <td style="text-align: center">{ &ldquo;type&rdquo;:  &ldquo;Polygon&rdquo;, &ldquo;coordinates&rdquo;: [ [ [10, 10], [10, 10], [10, 10], [10, 10] ] ] }</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">MultiPoint</td>
+          <td style="text-align: center">MULTIPOINT(*)</td>
+          <td style="text-align: center">{ &ldquo;type&rdquo;:  &ldquo;MultiPoint&rdquo;, &ldquo;coordinates&rdquo;: [*] }</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">MultiLineString</td>
+          <td style="text-align: center">MULTILINESTRING (*)</td>
+          <td style="text-align: center">{ &ldquo;type&rdquo;:  &ldquo;MultiLineString&rdquo;, &ldquo;coordinates&rdquo;: [*] }</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">MultiPolygon</td>
+          <td style="text-align: center">MULTIPOLYGON (*)</td>
+          <td style="text-align: center">{ &ldquo;type&rdquo;:  &ldquo;MultiPolygon&rdquo;, &ldquo;coordinates&rdquo;: [*] }</td>
+      </tr>
+      <tr>
+          <td style="text-align: center">GEOMETRYCOLLECTION</td>
+          <td style="text-align: center">GEOMETRYCOLLECTION(POINT(2 3),LINESTRING(2 3,3 4))</td>
+          <td style="text-align: center">-</td>
+      </tr>
+  </tbody>
 </table></div>
 <ul>
 <li>WKT与GeoJSON的区别
@@ -693,7 +690,7 @@ WKT是用来单独表示空间点、线、面数据，GeoJSON还可以用来表�
                 src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
                 
                 >
-            </script><script type="text/javascript" src="/ts/main.aaeac44545d266267249952419e48a1186aba78a56bdb962b00495ea3a337cd9.js" defer></script>
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
 <script>
     (function () {
         const customFont = document.createElement('link');

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Ops on 流年</title>
-        <link>http://localhost:1313/ops/</link>
+        <link>https://blog.liu-nian.top/ops/</link>
         <description>Recent content in Ops on 流年</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>流年</copyright>
-        <lastBuildDate>Thu, 16 May 2024 02:54:56 +0800</lastBuildDate><atom:link href="http://localhost:1313/ops/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 16 May 2024 02:54:56 +0800</lastBuildDate><atom:link href="https://blog.liu-nian.top/ops/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>搭建Markdown博客--基于hugo</title>
-        <link>http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</link>
+        <link>https://blog.liu-nian.top/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</link>
         <pubDate>Thu, 16 May 2024 02:54:56 +0800</pubDate>
         
-        <guid>http://localhost:1313/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</guid>
+        <guid>https://blog.liu-nian.top/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/</guid>
         <description>&lt;p&gt;&lt;strong&gt;摘要：&lt;/strong&gt;
 本文档详细介绍了使用Hugo搭建Markdown博客的过程，包括本地编辑环境搭建、主题样式修改、远程部署及图床搭建等步骤。通过本地编辑Markdown文档并预览，成功后可推送至GitHub私有仓库。Hugo将Markdown文档渲染为HTML文件，可利用GitHub Pages服务或VPS中的容器对外暴露。同时，文档还介绍了如何配置SSH Key、克隆主题仓库、修改主题样式，以及通过GitHub Pages或自建服务器进行远程部署，并提供了基于GitHub的图床搭建方法。&lt;/p&gt;
 &lt;p align=&#34;right&#34; &gt;&lt;i&gt;Powered by &lt;/i&gt;&lt;b&gt;百度Comate&lt;/b&gt;&lt;/p&gt;
@@ -922,10 +922,10 @@ File Name Format 这个选项比较关键，建议使用年月方式创建文件
         </item>
         <item>
         <title>LVM相关命令</title>
-        <link>http://localhost:1313/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/</link>
+        <link>https://blog.liu-nian.top/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/</link>
         <pubDate>Sat, 11 May 2024 08:38:47 +0000</pubDate>
         
-        <guid>http://localhost:1313/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/</guid>
+        <guid>https://blog.liu-nian.top/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/</guid>
         <description>&lt;p&gt;&lt;strong&gt;摘要:&lt;/strong&gt;
 本文详细介绍了Linux Volume Manager (LVM) 的相关命令，包括磁盘分区、物理卷创建、卷组管理、逻辑卷创建与管理、文件系统挂载与自动挂载等步骤。LVM 是一种逻辑卷管理技术，允许用户在物理磁盘上创建、扩展、缩减和移动分区，而不必重新分区或重新格式化磁盘。通过LVM，可以更灵活地管理存储空间，提高存储利用率和灵活性。&lt;/p&gt;
 &lt;p&gt;参考链接：https://support.huaweicloud.com/bestpractice-evs/evs_02_0002.html&lt;/p&gt;

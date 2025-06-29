@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="这个人很懒，暂时啥都没写">
-<title>Ops</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="llama.cpp推理-树莓派4b\n参考链接：https://github.com/ggerganov/llama.cpp\nhttps://qwen.readthedocs.io/zh-cn/latest/run_locally/llama.cpp.html\n裸机方式运行，非特殊框架，可以直接拉取官方镜像：\n硬件信息：\n平台架构：aarch64\n操作系统: Ubuntu 22.04.3 LTS\nCPU: 2\nMEM:4G\n创建环境 主要包括拉取代码、下载模型或生成模型等步骤\n1 2 3 4 5 6 7 8 9 10 11 # 1. 拉取代码 git clone https://github.com/ggerganov/llama.cpp llmama.cpp # 2. 编译代码 cd llama.cpp make make llama-cli # 如无需本地交互测试，不需要执行 # 3. 手动下载模型 #https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/tree/main https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/blob/main/qwen2-1_5b-instruct-q5_k_m.gguf # 或自己生成，需要python环境 python convert-hf-to-gguf.py Qwen/Qwen2-7B-Instruct --outfile qwen2-1_5b-instruct-f16.gguf 交互式测试 参数说明：\n">
+<title>llama.cpp推理-树莓派4b</title>
 
-<link rel='canonical' href='https://blog.liu-nian.top/ops/'>
+<link rel='canonical' href='https://blog.liu-nian.top/ai/llama.cpp/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Ops">
-<meta property='og:description' content="这个人很懒，暂时啥都没写">
-<meta property='og:url' content='https://blog.liu-nian.top/ops/'>
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="llama.cpp推理-树莓派4b">
+<meta property='og:description' content="llama.cpp推理-树莓派4b\n参考链接：https://github.com/ggerganov/llama.cpp\nhttps://qwen.readthedocs.io/zh-cn/latest/run_locally/llama.cpp.html\n裸机方式运行，非特殊框架，可以直接拉取官方镜像：\n硬件信息：\n平台架构：aarch64\n操作系统: Ubuntu 22.04.3 LTS\nCPU: 2\nMEM:4G\n创建环境 主要包括拉取代码、下载模型或生成模型等步骤\n1 2 3 4 5 6 7 8 9 10 11 # 1. 拉取代码 git clone https://github.com/ggerganov/llama.cpp llmama.cpp # 2. 编译代码 cd llama.cpp make make llama-cli # 如无需本地交互测试，不需要执行 # 3. 手动下载模型 #https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/tree/main https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/blob/main/qwen2-1_5b-instruct-q5_k_m.gguf # 或自己生成，需要python环境 python convert-hf-to-gguf.py Qwen/Qwen2-7B-Instruct --outfile qwen2-1_5b-instruct-f16.gguf 交互式测试 参数说明：\n">
+<meta property='og:url' content='https://blog.liu-nian.top/ai/llama.cpp/'>
 <meta property='og:site_name' content='流年'>
-<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2025-09-23T16:12:09&#43;00:00 '/>
-<meta name="twitter:title" content="Ops">
-<meta name="twitter:description" content="这个人很懒，暂时啥都没写"><link rel="alternate" type="application/rss&#43;xml" href="https://blog.liu-nian.top/ops/index.xml">
+<meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2024-09-25T08:38:25&#43;00:00'/><meta property='article:modified_time' content='2024-09-25T08:38:25&#43;00:00'/>
+<meta name="twitter:title" content="llama.cpp推理-树莓派4b">
+<meta name="twitter:description" content="llama.cpp推理-树莓派4b\n参考链接：https://github.com/ggerganov/llama.cpp\nhttps://qwen.readthedocs.io/zh-cn/latest/run_locally/llama.cpp.html\n裸机方式运行，非特殊框架，可以直接拉取官方镜像：\n硬件信息：\n平台架构：aarch64\n操作系统: Ubuntu 22.04.3 LTS\nCPU: 2\nMEM:4G\n创建环境 主要包括拉取代码、下载模型或生成模型等步骤\n1 2 3 4 5 6 7 8 9 10 11 # 1. 拉取代码 git clone https://github.com/ggerganov/llama.cpp llmama.cpp # 2. 编译代码 cd llama.cpp make make llama-cli # 如无需本地交互测试，不需要执行 # 3. 手动下载模型 #https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/tree/main https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/blob/main/qwen2-1_5b-instruct-q5_k_m.gguf # 或自己生成，需要python环境 python convert-hf-to-gguf.py Qwen/Qwen2-7B-Instruct --outfile qwen2-1_5b-instruct-f16.gguf 交互式测试 参数说明：\n">
     </head>
-    <body class="">
+    <body class="
+    article-page
+    ">
     <script>
         (function() {
             const colorSchemeKey = 'StackColorScheme';
@@ -285,165 +287,203 @@
     </ol>
 </aside>
 
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                <form action="/search/" class="search-form widget" >
-        <p>
-            <label>搜索</label>
-            <input name="keyword" required placeholder="输入关键词..." />
-        
-            <button title="搜索">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-            </button>
-        </p>
-    </form>
-            
-        
-            
-                <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">归档</h2>
-
-        
-        
-        
-        
-        
-        <div class="widget-archive--list">
-            <div class="archives-year">
-                    <a href="/archives/#2025">
-                        
-                            <span class="year">2025</span>
-                            <span class="count">3</span>
-                        
-                    </a> 
-                </div>
-            <div class="archives-year">
-                    <a href="/archives/#2024">
-                        
-                            <span class="year">2024</span>
-                            <span class="count">7</span>
-                        
-                    </a> 
-                </div>
-            
-        </div>
-    </section>
-            
-        
-            
-                <section class="widget tagCloud">
-    <div class="widget-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-    </div>
-    <h2 class="widget-title section-title">分类</h2>
-
-    <div class="tagCloud-tags">
-        
-    </div>
-</section>
-
-            
-        
-            
-                <section class="widget tagCloud">
-    <div class="widget-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
-  <circle cx="9" cy="9" r="2" />
-</svg>
-
-
-
-    </div>
-    <h2 class="widget-title section-title">标签云</h2>
-
-    <div class="tagCloud-tags">
-        
-            <a href="/tags/hugo/" class="font_size_1">
-                Hugo
-            </a>
-        
-            <a href="/tags/markdown/" class="font_size_1">
-                Markdown
-            </a>
-        
-    </div>
-</section>
-            
-        
-    </aside>
-
+    
 
             <main class="main full-width">
-    <header>
-        <h3 class="section-title">
-            
-                章节
-            
-        </h3>
+    <article class="main-article">
+    <header class="article-header">
 
-        <div class="section-card">
-            <div class="section-details">
-                <h3 class="section-count">2 个页面</h3>
-                <h1 class="section-term">Ops</h1>
-                
-            </div>
-        </div>
-    </header>
+    <div class="article-details">
     
-    <section class="article-list--compact">
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/ai/llama.cpp/">llama.cpp推理-树莓派4b</a>
+        </h2>
+    
         
-            <article>
-    <a href="/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/">
-        <div class="article-details">
-            <h2 class="article-title">搭建Markdown博客--基于hugo</h2>
-            <footer class="article-time">
-                <time datetime='2024-05-16T02:54:56&#43;08:00'>May 16, 2024</time>
-            </footer>
-        </div>
-    </a>
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 25, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>llama.cpp推理-树莓派4b</p>
+<p>参考链接：<a class="link" href="https://github.com/ggerganov/llama.cpp"  target="_blank" rel="noopener"
+    >https://github.com/ggerganov/llama.cpp</a></p>
+<p><a class="link" href="https://qwen.readthedocs.io/zh-cn/latest/run_locally/llama.cpp.html"  target="_blank" rel="noopener"
+    >https://qwen.readthedocs.io/zh-cn/latest/run_locally/llama.cpp.html</a></p>
+<p>裸机方式运行，非特殊框架，可以直接拉取官方镜像：</p>
+<p><strong>硬件信息：</strong></p>
+<p>平台架构：aarch64</p>
+<p>操作系统: Ubuntu 22.04.3 LTS</p>
+<p>CPU: 2</p>
+<p>MEM:4G</p>
+<ol>
+<li>创建环境</li>
+</ol>
+<p>主要包括拉取代码、下载模型或生成模型等步骤</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 1. 拉取代码
+</span></span><span class="line"><span class="cl">git clone https://github.com/ggerganov/llama.cpp llmama.cpp
+</span></span><span class="line"><span class="cl"># 2. 编译代码
+</span></span><span class="line"><span class="cl">cd llama.cpp
+</span></span><span class="line"><span class="cl">make
+</span></span><span class="line"><span class="cl">make llama-cli  # 如无需本地交互测试，不需要执行
+</span></span><span class="line"><span class="cl"># 3. 手动下载模型
+</span></span><span class="line"><span class="cl">#https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/tree/main
+</span></span><span class="line"><span class="cl">https://huggingface.co/Qwen/Qwen2-1.5B-Instruct-GGUF/blob/main/qwen2-1_5b-instruct-q5_k_m.gguf
+</span></span><span class="line"><span class="cl"># 或自己生成，需要python环境
+</span></span><span class="line"><span class="cl">python convert-hf-to-gguf.py Qwen/Qwen2-7B-Instruct --outfile qwen2-1_5b-instruct-f16.gguf
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>交互式测试</li>
+</ol>
+<p>参数说明：</p>
+<ul>
+<li>-m 指模型地址</li>
+<li>-cnv 指会话模式</li>
+<li>-p 指的输入信息，必须要传入</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">./llama-cli  -m models/qwen2-1_5b-instruct-q5_k_m.gguf -cnv -p &#39;你是一个人工智能专家&#39;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运行成功的截图如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-06/468abb8e648bbcb7b6f57b77a0cea71837a3396d56b4ef9bf0487017a0c75985.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="picture 0"
+	
+	
+></p>
+<ol start="3">
+<li>API 发布测试</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">./llama-server -m /opt/codes/models/qwen2-1_5b-instruct-q5_k_m.gguf  --port 8000 --host 0.0.0.0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>前台页面访问测试</p>
+<p><a class="link" href="https://192.168.2.189:8080/index-new.html"  target="_blank" rel="noopener"
+    >http://192.168.2.189:8080/</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
 </article>
+
+    
+
+    
+
+     
+    
         
-            <article>
-    <a href="/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/">
-        <div class="article-details">
-            <h2 class="article-title">LVM相关命令</h2>
-            <footer class="article-time">
-                <time datetime='2024-05-11T08:38:47Z'>May 11, 2024</time>
-            </footer>
-        </div>
-    </a>
-</article>
-        
-    </section>
-<footer class="site-footer">
+    
+
+    <footer class="site-footer">
     <section class="copyright">
         &copy; 
         
@@ -458,6 +498,84 @@
     </section>
 </footer>
 
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
 
             </main>
         </div>

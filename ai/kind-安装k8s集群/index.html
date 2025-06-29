@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="这个人很懒，暂时啥都没写">
-<title>Ops</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="使用kind安装k8s以及相关应用，并分析其基本架构">
+<title>kind 安装k8s集群</title>
 
-<link rel='canonical' href='https://blog.liu-nian.top/ops/'>
+<link rel='canonical' href='https://blog.liu-nian.top/ai/kind-%E5%AE%89%E8%A3%85k8s%E9%9B%86%E7%BE%A4/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Ops">
-<meta property='og:description' content="这个人很懒，暂时啥都没写">
-<meta property='og:url' content='https://blog.liu-nian.top/ops/'>
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="kind 安装k8s集群">
+<meta property='og:description' content="使用kind安装k8s以及相关应用，并分析其基本架构">
+<meta property='og:url' content='https://blog.liu-nian.top/ai/kind-%E5%AE%89%E8%A3%85k8s%E9%9B%86%E7%BE%A4/'>
 <meta property='og:site_name' content='流年'>
-<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2025-09-23T16:12:09&#43;00:00 '/>
-<meta name="twitter:title" content="Ops">
-<meta name="twitter:description" content="这个人很懒，暂时啥都没写"><link rel="alternate" type="application/rss&#43;xml" href="https://blog.liu-nian.top/ops/index.xml">
+<meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2024-05-11T08:38:25&#43;00:00'/><meta property='article:modified_time' content='2024-05-11T08:38:25&#43;00:00'/>
+<meta name="twitter:title" content="kind 安装k8s集群">
+<meta name="twitter:description" content="使用kind安装k8s以及相关应用，并分析其基本架构">
     </head>
-    <body class="">
+    <body class="
+    article-page
+    ">
     <script>
         (function() {
             const colorSchemeKey = 'StackColorScheme';
@@ -288,69 +290,10 @@
     <aside class="sidebar right-sidebar sticky">
         
             
-                <form action="/search/" class="search-form widget" >
-        <p>
-            <label>搜索</label>
-            <input name="keyword" required placeholder="输入关键词..." />
-        
-            <button title="搜索">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="10" cy="10" r="7" />
-  <line x1="21" y1="21" x2="15" y2="15" />
-</svg>
-
-
-
-            </button>
-        </p>
-    </form>
-            
-        
-            
-                <section class="widget archives">
+                
+    <section class="widget archives">
         <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">归档</h2>
-
-        
-        
-        
-        
-        
-        <div class="widget-archive--list">
-            <div class="archives-year">
-                    <a href="/archives/#2025">
-                        
-                            <span class="year">2025</span>
-                            <span class="count">3</span>
-                        
-                    </a> 
-                </div>
-            <div class="archives-year">
-                    <a href="/archives/#2024">
-                        
-                            <span class="year">2024</span>
-                            <span class="count">7</span>
-                        
-                    </a> 
-                </div>
-            
-        </div>
-    </section>
-            
-        
-            
-                <section class="widget tagCloud">
-    <div class="widget-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
   <line x1="5" y1="9" x2="19" y2="9" />
   <line x1="5" y1="15" x2="19" y2="15" />
@@ -360,90 +303,308 @@
 
 
 
-    </div>
-    <h2 class="widget-title section-title">分类</h2>
-
-    <div class="tagCloud-tags">
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
         
-    </div>
-</section>
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li><a href="#资源要求">资源要求：</a></li>
+        <li><a href="#centos-7-在线升级内核"><del>centos 7 在线升级内核</del></a></li>
+        <li><a href="#安装dockerkubectl">安装docker/kubectl</a></li>
+        <li><a href="#安装k8s">安装k8s</a></li>
+        <li><a href="#kind架构">kind架构</a>
+          <ol>
+            <li><a href="#containerport-vs-hostport">containerPort vs. hostPort</a></li>
+            <li><a href="#port-vs-targetport-vs-nodeport">port vs. targetPort vs. nodePort</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
 
-            
-        
-            
-                <section class="widget tagCloud">
-    <div class="widget-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
-  <circle cx="9" cy="9" r="2" />
-</svg>
-
-
-
-    </div>
-    <h2 class="widget-title section-title">标签云</h2>
-
-    <div class="tagCloud-tags">
-        
-            <a href="/tags/hugo/" class="font_size_1">
-                Hugo
-            </a>
-        
-            <a href="/tags/markdown/" class="font_size_1">
-                Markdown
-            </a>
-        
-    </div>
-</section>
             
         
     </aside>
 
 
             <main class="main full-width">
-    <header>
-        <h3 class="section-title">
-            
-                章节
-            
-        </h3>
+    <article class="main-article">
+    <header class="article-header">
 
-        <div class="section-card">
-            <div class="section-details">
-                <h3 class="section-count">2 个页面</h3>
-                <h1 class="section-term">Ops</h1>
-                
-            </div>
-        </div>
-    </header>
+    <div class="article-details">
     
-    <section class="article-list--compact">
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/ai/kind-%E5%AE%89%E8%A3%85k8s%E9%9B%86%E7%BE%A4/">kind 安装k8s集群</a>
+        </h2>
+    
         
-            <article>
-    <a href="/ops/%E6%90%AD%E5%BB%BAhugo%E5%8D%9A%E5%AE%A2/">
-        <div class="article-details">
-            <h2 class="article-title">搭建Markdown博客--基于hugo</h2>
-            <footer class="article-time">
-                <time datetime='2024-05-16T02:54:56&#43;08:00'>May 16, 2024</time>
-            </footer>
-        </div>
-    </a>
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 11, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h3 id="资源要求">资源要求：
+</h3><p>4C/8G</p>
+<p><a class="link" href="https://kind.sigs.k8s.io/docs/user/known-issues/#failure-to-create-cluster-with-cgroups-v2"  target="_blank" rel="noopener"
+    >https://kind.sigs.k8s.io/docs/user/known-issues/#failure-to-create-cluster-with-cgroups-v2</a></p>
+<h3 id="centos-7-在线升级内核"><del>centos 7 在线升级内核</del>
+</h3><p>默认内核版本太低</p>
+<p>![image-20240513154841260](/Users/yangzedong/Library/Application Support/typora-user-images/image-20240513154841260.png)</p>
+<p>参考链接：https://www.cnblogs.com/liugp/p/16950443.html</p>
+<h3 id="安装dockerkubectl">安装docker/kubectl
+</h3><p>kubectl :https://kubernetes.io/zh-cn/docs/tasks/tools/install-kubectl-linux/</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl -LO <span class="s2">&#34;https://dl.k8s.io/release/</span><span class="k">$(</span>curl -L -s https://dl.k8s.io/release/stable.txt<span class="k">)</span><span class="s2">/bin/linux/amd64/kubectl&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>docker：https://www.runoob.com/docker/centos-docker-install.html</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl -fsSL https://get.docker.com <span class="p">|</span> bash -s docker --mirror Aliyun
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Helm:https://helm.sh/zh/docs/intro/install/</p>
+<h3 id="安装k8s">安装k8s
+</h3><p>参考文档：https://github.com/kubernetes-sigs/kind/tree/v0.22.0</p>
+<ol>
+<li>
+<p>安装kind 二进制文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span> <span class="k">$(</span>uname -m<span class="k">)</span> <span class="o">=</span> x86_64 <span class="o">]</span> <span class="o">&amp;&amp;</span> curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.21.0/kind-<span class="k">$(</span>uname<span class="k">)</span>-amd64
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>*可能比较慢，可以选择手动下载安装，二进制包下载地址：https://github.com/kubernetes-sigs/kind/releases</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 执行安装操作
+</span></span><span class="line"><span class="cl">chmod +x ./kind
+</span></span><span class="line"><span class="cl">chmod +x ./kind
+</span></span><span class="line"><span class="cl">mv ./kind /usr/local/bin/
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>拉取镜像（可选）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 选一个版本
+</span></span><span class="line"><span class="cl">$ docker search kindest/node
+</span></span><span class="line"><span class="cl">NAME                 DESCRIPTION                           STARS     OFFICIAL
+</span></span><span class="line"><span class="cl">kindest/node         https://sigs.k8s.io/kind node image   104       
+</span></span><span class="line"><span class="cl">kindest/node-amd64                                         2         
+</span></span><span class="line"><span class="cl">kindest/node-arm64                                         0     
+</span></span><span class="line"><span class="cl"># 镜像拉取
+</span></span><span class="line"><span class="cl">docker pull kindest/node
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>安装集群</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># 在线创建集群
+</span></span><span class="line"><span class="cl">kind create cluster
+</span></span><span class="line"><span class="cl"># 指定 配置文件
+</span></span><span class="line"><span class="cl"># kind create cluster --config kind-example-config.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>配置文件地址：https://kind.sigs.k8s.io/docs/user/configuration/</p>
+</li>
+<li>
+<p>安装ingress</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="c1"># 1. 获取yaml</span>
+</span></span><span class="line"><span class="cl"><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">raw</span><span class="o">.</span><span class="n">githubusercontent</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">kubernetes</span><span class="o">/</span><span class="n">ingress</span><span class="o">-</span><span class="n">nginx</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">deploy</span><span class="o">/</span><span class="k">static</span><span class="o">/</span><span class="n">provider</span><span class="o">/</span><span class="n">kind</span><span class="o">/</span><span class="n">deploy</span><span class="o">.</span><span class="n">yaml</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 因服务器无外网，mac上进行下载，指定架构：一般是amd64和arm64、aarch64</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.1</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># registry.k8s.io/ingress-nginx/controller:v1.10.1</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.4.1 </span>
+</span></span><span class="line"><span class="cl"><span class="n">docker</span> <span class="n">pull</span> <span class="o">--</span><span class="n">platform</span> <span class="n">amd64</span> <span class="n">xxx</span> 
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. 装载image</span>
+</span></span><span class="line"><span class="cl"><span class="n">kind</span> <span class="nb">load</span> <span class="n">docker</span><span class="o">-</span><span class="n">image</span> <span class="n">img</span><span class="p">:</span><span class="n">v1</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 或者</span>
+</span></span><span class="line"><span class="cl"><span class="n">kind</span> <span class="nb">load</span> <span class="n">image</span><span class="o">-</span><span class="n">archive</span> <span class="n">my</span><span class="o">-</span><span class="n">image</span><span class="o">-</span><span class="n">archive</span><span class="o">.</span><span class="n">tar</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<p>![image-20240513220418988](/Users/yangzedong/Library/Application Support/typora-user-images/image-20240513220418988.png)</p>
+<h3 id="kind架构">kind架构
+</h3><p>参考文档：https://kind.sigs.k8s.io/docs/design/initial/</p>
+<p><img src="https://kind.sigs.k8s.io/docs/images/diagram.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="img"
+	
+	
+></p>
+<ol>
+<li>
+<p>k8s中的端口映射</p>
+<p>参考地址：https://www.cnblogs.com/baixiaoyong/p/16051137.html</p>
+<p>k8s中的pod:https://fly-luck.github.io/2018/04/15/Kubernetes%20Ports/</p>
+<h4 id="containerport-vs-hostport">containerPort vs. hostPort
+</h4><p>出现在如Deployment、Pod等资源对象描述文件中的容器部分，针对容器端口起类似于<code>docker run -p &lt;containerPort&gt;:&lt;hostPort&gt;</code>的作用：
+<code>containerPort</code>：容器暴露的端口。
+<code>hostPort</code>：容器暴露的端口直接映射到的主机端口。</p>
+<h4 id="port-vs-targetport-vs-nodeport">port vs. targetPort vs. nodePort
+</h4><p>出现在Service描述文件中，当Service的类型为<code>ClusterIP</code>时：
+<code>port</code>：Service中ClusterIP对应的端口。
+<code>targetport</code>：clusterIP作为负载均衡， 后端目标实例（容器）的端口，与上述<code>containerPort</code>保持一致。</p>
+<p>当Service的类型为<code>NodePort</code>时：
+<code>nodePort</code>：由于ClusterIP只能集群内访问，配置nodePort会在每个运行<code>kubelet</code>节点的宿主机打开一个端口，用于集群外部访问。</p>
+</li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
 </article>
+
+    
+
+    
+
+     
+    
         
-            <article>
-    <a href="/ops/lvm%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4/">
-        <div class="article-details">
-            <h2 class="article-title">LVM相关命令</h2>
-            <footer class="article-time">
-                <time datetime='2024-05-11T08:38:47Z'>May 11, 2024</time>
-            </footer>
-        </div>
-    </a>
-</article>
-        
-    </section>
-<footer class="site-footer">
+    
+
+    <footer class="site-footer">
     <section class="copyright">
         &copy; 
         
@@ -458,6 +619,84 @@
     </section>
 </footer>
 
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
 
             </main>
         </div>

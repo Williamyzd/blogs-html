@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="目标 docker-compose、k8s-yaml\n准备镜像 这里以llama.cpp的基础镜像作为参考。选择llama.cpp的原因是他支持非常多种类的加速卡，同时也支持cpu运行大模型。 使用官方已有镜像 如果机器环境的CUDA版本与官方镜像的兼容，可以直接使用官方镜像。 参考链接：https://github.com/ggerganov/llama.cpp/blob/master/docs/docker.md 如果有GPU，建议使用：ghcr.io/ggerganov/llama.cpp:server-cuda 如果没有gpu，建议使用：ghcr.io/ggerganov/llama.cpp:server 如果想要拉取默认的基础镜像为最新版本，check下最新的dockerfile文件，确认下是否与自己环境的cuda版本兼容。链接如下：https://github.com/ggerganov/llama.cpp/tree/master/.devops 如果最新的镜像不能满足需求，可以尝试搜索下历史镜像 可访问页面进行搜索:https://github.com/ggerganov/llama.cpp/pkgs/container/llama.cpp\n">
+<title>如何部署生产级别的大模型推理服务</title>
+
+<link rel='canonical' href='https://blog.liu-nian.top/ai/%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E7%94%9F%E4%BA%A7%E7%BA%A7%E5%88%AB%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E5%8A%A1%E7%90%86/'>
+
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="如何部署生产级别的大模型推理服务">
+<meta property='og:description' content="目标 docker-compose、k8s-yaml\n准备镜像 这里以llama.cpp的基础镜像作为参考。选择llama.cpp的原因是他支持非常多种类的加速卡，同时也支持cpu运行大模型。 使用官方已有镜像 如果机器环境的CUDA版本与官方镜像的兼容，可以直接使用官方镜像。 参考链接：https://github.com/ggerganov/llama.cpp/blob/master/docs/docker.md 如果有GPU，建议使用：ghcr.io/ggerganov/llama.cpp:server-cuda 如果没有gpu，建议使用：ghcr.io/ggerganov/llama.cpp:server 如果想要拉取默认的基础镜像为最新版本，check下最新的dockerfile文件，确认下是否与自己环境的cuda版本兼容。链接如下：https://github.com/ggerganov/llama.cpp/tree/master/.devops 如果最新的镜像不能满足需求，可以尝试搜索下历史镜像 可访问页面进行搜索:https://github.com/ggerganov/llama.cpp/pkgs/container/llama.cpp\n">
+<meta property='og:url' content='https://blog.liu-nian.top/ai/%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E7%94%9F%E4%BA%A7%E7%BA%A7%E5%88%AB%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E5%8A%A1%E7%90%86/'>
+<meta property='og:site_name' content='流年'>
+<meta property='og:type' content='article'><meta property='article:section' content='Ai' /><meta property='article:published_time' content='2025-02-05T17:29:32&#43;08:00'/><meta property='article:modified_time' content='2025-02-05T17:29:32&#43;08:00'/>
+<meta name="twitter:title" content="如何部署生产级别的大模型推理服务">
+<meta name="twitter:description" content="目标 docker-compose、k8s-yaml\n准备镜像 这里以llama.cpp的基础镜像作为参考。选择llama.cpp的原因是他支持非常多种类的加速卡，同时也支持cpu运行大模型。 使用官方已有镜像 如果机器环境的CUDA版本与官方镜像的兼容，可以直接使用官方镜像。 参考链接：https://github.com/ggerganov/llama.cpp/blob/master/docs/docker.md 如果有GPU，建议使用：ghcr.io/ggerganov/llama.cpp:server-cuda 如果没有gpu，建议使用：ghcr.io/ggerganov/llama.cpp:server 如果想要拉取默认的基础镜像为最新版本，check下最新的dockerfile文件，确认下是否与自己环境的cuda版本兼容。链接如下：https://github.com/ggerganov/llama.cpp/tree/master/.devops 如果最新的镜像不能满足需求，可以尝试搜索下历史镜像 可访问页面进行搜索:https://github.com/ggerganov/llama.cpp/pkgs/container/llama.cpp\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/logo_hu_fd3008965b65babe.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">流年</a></h1>
+            <h2 class="site-description">这个人很懒，暂时啥都没写</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/Williamyzd'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://www.zhihu.com/people/william-19-37'
+                        target="_blank"
+                        title="知乎"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738662787698" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="10144" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M526.677333 766.421333l-72.021333 45.824-90.922667-142.933333c-18.773333 59.818667-50.005333 113.706667-91.264 163.2-17.152 20.608-34.986667 39.168-55.509333 58.666667-6.613333 6.272-33.066667 30.592-37.461333 34.986666l-60.330667-60.330666c5.930667-5.930667 33.578667-31.36 39.04-36.522667 18.346667-17.408 33.92-33.706667 48.725333-51.456 54.016-64.768 86.613333-136.96 91.178667-223.189333H128v-85.333334h170.666667V298.666667h-37.034667c-29.397333 54.016-66.474667 94.805333-111.701333 121.898666L106.069333 347.434667c59.52-35.754667 103.466667-111.104 129.621334-228.693334l83.285333 18.517334c-5.973333 27.008-12.928 52.352-20.864 76.074666H490.666667v85.333334H384v170.666666h106.666667v85.333334H391.893333l134.784 211.754666z m163.754667-2.986666L738.048 725.333333H810.666667V298.666667h-170.666667v426.666666h31.402667l19.029333 38.101334zM554.666667 213.333333h341.333333v597.333334h-128l-106.666667 85.333333-42.666666-85.333333H554.666667V213.333333z" p-id="10145" fill="#8a8a8a"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://mp.weixin.qq.com/s/YOHKU850wcmPfWCjeAZ7zw'
+                        target="_blank"
+                        title="wechat"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738662705411" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9050" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M767.818667 409.173333C867.338667 444.266667 938.666667 539.136 938.666667 650.666667c0 42.709333-10.496 83.978667-30.261334 120.842666-1.792 3.338667-4.992 8.928-9.696 16.96l14.613334 53.557334c6.506667 23.893333-15.402667 45.813333-39.296 39.296l-53.642667-14.634667-6.229333 3.669333A254.933333 254.933333 0 0 1 682.666667 906.666667c-77.994667 0-147.84-34.88-194.805334-89.888a352.608 352.608 0 0 1-56.64 4.554666c-63.338667 0-124.266667-16.853333-177.472-48.298666-1.834667-1.088-6.410667-3.733333-13.632-7.893334l-80.544 21.653334c-23.914667 6.432-45.76-15.573333-39.146666-39.434667l21.792-78.752a961.205333 961.205333 0 0 1-15.904-27.317333A336.384 336.384 0 0 1 85.333333 480c0-188.618667 154.965333-341.333333 345.888-341.333333 159.914667 0 297.984 108.010667 335.818667 259.296 0.949333 3.765333 1.173333 7.552 0.778667 11.2z m-68.106667-13.952C662.88 282.037333 555.178667 202.666667 431.221333 202.666667 275.434667 202.666667 149.333333 326.933333 149.333333 480c0 46.272 11.498667 90.837333 33.194667 130.698667 2.88 5.290667 10.176 17.706667 21.621333 36.746666a32 32 0 0 1 3.413334 25.013334l-10.517334 37.994666 39.232-10.549333a32 32 0 0 1 24.234667 3.146667c14.272 8.192 22.773333 13.098667 25.802667 14.890666A283.882667 283.882667 0 0 0 431.221333 757.333333c6.154667 0 12.288-0.192 18.389334-0.576A255.061333 255.061333 0 0 1 426.666667 650.666667c0-141.386667 114.613333-256 256-256 5.728 0 11.413333 0.192 17.045333 0.554666z m133.706667 397.056a32 32 0 0 1 3.338666-24.725333 996.672 996.672 0 0 0 15.242667-26.293333A190.997333 190.997333 0 0 0 874.666667 650.666667c0-106.037333-85.962667-192-192-192s-192 85.962667-192 192 85.962667 192 192 192a190.933333 190.933333 0 0 0 98.570666-27.2c2.208-1.322667 8.288-4.874667 18.517334-10.837334a32 32 0 0 1 24.522666-3.210666l12.565334 3.424-3.424-12.565334zM330.666667 426.666667a42.666667 42.666667 0 1 1 0-85.333334 42.666667 42.666667 0 0 1 0 85.333334z m192 0a42.666667 42.666667 0 1 1 0-85.333334 42.666667 42.666667 0 0 1 0 85.333334z m85.333333 202.666666a32 32 0 1 1 0-64 32 32 0 0 1 0 64z m149.333333 0a32 32 0 1 1 0-64 32 32 0 0 1 0 64z" fill="#8a8a8a" p-id="9051"></path></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/ai' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342212304" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4225" width="48" height="48" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M501.824 32C303.552 32 141.504 176.992 141.504 357.76c0 23.712 2.816 47.104 8.32 69.856l-51.008 114.208a32 32 0 0 0 24.704 44.736c54.272 7.744 76.672 31.168 76.672 77.312v111.552a64 64 0 0 0 64 64h20.704a64 64 0 0 1 64 64V960a32 32 0 0 0 32 32h345.6a32 32 0 0 0 0-64h-313.6v-24.608a128 128 0 0 0-128-128h-20.736v-111.552c0-65.664-32.192-110.688-91.2-131.136l39.872-89.28a31.968 31.968 0 0 0 1.568-21.792 233.088 233.088 0 0 1-8.896-63.904c0-143.712 131.936-261.76 296.32-261.76s296.32 118.016 296.32 261.76a32 32 0 0 0 64 0C862.144 176.992 700.064 32 501.824 32zM904 448a32 32 0 0 0-32 32v360a32 32 0 0 0 64 0V480a32 32 0 0 0-32-32z" p-id="4226"></path><path d="M673.888 466.656c-11.744-25.568-48.416-24.64-58.816 1.536l-132.8 333.76a32 32 0 0 0 59.488 23.68l32.608-81.92c0.576 0.032 1.088 0.32 1.664 0.32h154.848l38.176 83.104a31.968 31.968 0 1 0 58.144-26.72l-153.312-333.76zM599.68 680l47.264-118.72 54.528 118.72H599.68z" p-id="4227"></path></svg>
+                
+                <span>AI</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/cs' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342654057" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9507" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M954.1888 786.3552h-332.032v178.176h130.8416c16.0256 0 29.4912 12.928 29.4912 29.4656 0 16.5632-12.928 30.0032-29.4912 30.0032H271.0016a29.4912 29.4912 0 0 1-29.4912-29.4912c0-16.5376 12.928-29.9776 29.4912-29.9776h130.3296v-178.176H69.8112A69.8368 69.8368 0 0 1 0 716.544V69.8112A70.1696 70.1696 0 0 1 69.8112 0h884.3776A69.8368 69.8368 0 0 1 1024 69.8112V716.544a69.8368 69.8368 0 0 1-69.8112 69.8112z m-492.8768 178.176h100.864v-178.176h-100.864v178.176zM964.5312 59.4688H59.4688v667.4176h905.0624V59.4688zM175.3344 364.8512l107.5456-108.0832c5.7088-5.6832 12.9536-8.7808 21.2224-8.7808 7.7568 0 15.5136 3.0976 21.1968 8.7808 11.904 11.392 11.3664 30.5152 0 41.8816l-92.0576 92.0832 92.0576 92.032a30.1568 30.1568 0 0 1-0.512 42.4192 28.16 28.16 0 0 1-20.6848 8.7808c-7.7568 0-15.0016-3.0976-20.6848-8.7808l-107.0592-107.0592-1.024-1.024a59.52 59.52 0 0 1-5.7088-4.6592 29.2864 29.2864 0 0 1-8.7808-21.1968v-1.0496c0-8.2688 3.0976-15.5136 8.7808-21.1968a23.3472 23.3472 0 0 1 5.7088-4.1472z m391.4752-112.7424a30.9248 30.9248 0 0 1 25.8816-15.488c5.1712 0 10.3424 1.536 14.976 4.1216 7.2448 4.1216 11.904 10.3424 13.9776 18.0992 2.0736 7.7568 1.024 16.0256-3.0976 22.7584l-160.8448 278.2464a30.1312 30.1312 0 0 1-40.3456 10.8544 29.2352 29.2352 0 0 1-11.3664-40.3456l160.8192-278.2464z m123.1104 41.9072c0-8.2944 3.0976-15.5136 8.7808-21.2224 5.6832-5.6832 13.44-8.7808 21.1968-8.7808 7.7568 0 15.0016 3.0976 20.6848 8.7808l107.0592 107.0592 1.0496 0.512c2.048 1.0496 4.1216 2.5856 5.6832 4.1472 5.6832 5.6832 8.7808 13.44 8.7808 21.1968v3.1232c-0.512 7.2448-3.6096 13.952-8.7808 19.1232-1.5616 1.536-3.0976 2.5856-5.1712 5.6832l-108.1088 108.0832a30.08 30.08 0 0 1-21.1968 8.8064c-8.2688 0-15.5136-3.0976-21.1968-8.8064a30.1568 30.1568 0 0 1-8.7808-21.1968c0-8.2688 3.0976-15.5136 8.7808-21.1968l92.0576-92.0576-92.0576-92.0576a30.1568 30.1568 0 0 1-8.7808-21.1968z" fill="#7C848E" p-id="9508"></path></svg>
+                
+                <span>CS基础</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/ops' >
+                
+                
+                
+                    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738342768989" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11403" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48"><path d="M685.1 727.2h4.1c77.5-19 135.9-69.3 150.9-133.2 8.2-36.7 1.4-66.6-1.4-77.5-17.7-69.3-77.5-119.6-150.9-126.4h-19c-32.6-59.8-95.2-96.5-163.1-96.5-91.1 0-168.6 66.6-183.5 153.6-73.4 4.1-130.5 63.9-130.5 138.7 0 77.5 63.9 140 141.4 140h334.4M656.4 672H346.7c-51.6 0-93.2-41.6-93.2-91.9 0-51.6 41.6-93.2 93.2-93.2h2.5l20.1 1.3 1.3-18.9c5-70.5 64.2-124.7 134.7-124.7 52.9 0 100.7 31.5 123.4 79.3l6.3 12.6 13.9-1.3c7.6-1.3 13.9-1.3 22.7-1.3 51.6 5 93.2 40.3 105.8 89.4 2.5 7.6 7.6 29 1.3 54.1-10.1 44.1-52.9 79.3-108.3 94.4" fill="#444444" p-id="11404"></path><path d="M949.7 475c-13.3 0-25-9.7-27.1-23.3C908 357.5 860 271 787.4 208.2c-35.9-31.1-76.6-55.3-120.8-72.1-45.8-17.4-94-26.2-143.4-26.2-136.4 0-262.7 68.1-337.8 182.3-8.4 12.7-25.4 16.2-38.1 7.9-12.7-8.4-16.2-25.4-7.9-38.1C224.7 132.4 368.2 55 523.2 55c56.1 0 110.9 10 162.9 29.8 50.2 19.1 96.4 46.6 137.2 81.9 82.4 71.3 137 169.5 153.6 276.7 2.3 15-8 29.1-23 31.4-1.4 0.1-2.8 0.2-4.2 0.2zM523.2 973.2c-62 0-122.1-12.1-178.7-36.1-54.7-23.1-103.8-56.2-145.9-98.4-42.2-42.2-75.3-91.3-98.4-145.9-24-56.6-36.1-116.8-36.1-178.7 0-15.5 0.8-31.2 2.3-46.6 1.5-15.1 15-26.1 30.1-24.6 15.1 1.5 26.1 15 24.6 30.1-1.4 13.6-2.1 27.4-2.1 41.1 0 54.6 10.7 107.5 31.7 157.3 20.4 48.1 49.5 91.3 86.6 128.5 37.1 37.1 80.3 66.3 128.5 86.6 49.8 21.1 102.7 31.7 157.3 31.7 86.1 0 168.4-26.7 237.7-77.3 33.4-24.4 62.8-53.6 87.4-86.8 24.9-33.6 44.3-70.7 57.6-110.1 4.9-14.4 20.5-22.1 34.9-17.2 14.4 4.9 22.1 20.5 17.2 34.9-15.2 44.8-37.3 86.9-65.5 125.1-27.9 37.7-61.3 70.9-99.3 98.6-78.6 57.5-172 87.8-269.9 87.8z" fill="#444444" p-id="11405"></path><path d="M75.5 405.1l-56.6 98c-6.2 10.8 1.6 24.2 14 24.2H146c12.4 0 20.2-13.5 14-24.2l-56.6-98c-6.2-10.7-21.7-10.7-27.9 0zM952.3 501.2l54.4-94.2c6.7-11.6-1.7-26.1-15.1-26.1H882.8c-13.4 0-21.8 14.5-15.1 26.1l54.4 94.2c6.8 11.6 23.5 11.6 30.2 0z" fill="#444444" p-id="11406"></path></svg>
+                
+                <span>运维&amp;工具</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#目标">目标</a></li>
+    <li><a href="#准备镜像">准备镜像</a>
+      <ol>
+        <li><a href="#使用官方已有镜像">使用官方已有镜像</a></li>
+        <li><a href="#自定义镜像">自定义镜像</a></li>
+      </ol>
+    </li>
+    <li><a href="#准备模型">准备模型</a></li>
+    <li><a href="#docker-compose撰写">docker-compose撰写</a></li>
+    <li><a href="#k8s-yaml撰写">k8s-yaml撰写</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/ai/%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2%E7%94%9F%E4%BA%A7%E7%BA%A7%E5%88%AB%E7%9A%84%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%8E%A8%E7%90%86%E5%8A%A1%E7%90%86/">如何部署生产级别的大模型推理服务</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 05, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="目标">目标
+</h2><p>docker-compose、k8s-yaml</p>
+<h2 id="准备镜像">准备镜像
+</h2><p>这里以llama.cpp的基础镜像作为参考。选择llama.cpp的原因是他支持非常多种类的加速卡，同时也支持cpu运行大模型。
+<img src="https://cdn.jsdelivr.net/gh/Williamyzd/pub-imgs@main/2025-02/698a32cbe8f49f56f8790dc8da8731d5cc36c0d5cf5cfe9de6efa163b534b6f4.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="698a32cbe8f49f56f8790dc8da8731d5cc36c0d5cf5cfe9de6efa163b534b6f4"
+	
+	
+></p>
+<h3 id="使用官方已有镜像">使用官方已有镜像
+</h3><p>如果机器环境的CUDA版本与官方镜像的兼容，可以直接使用官方镜像。
+参考链接：https://github.com/ggerganov/llama.cpp/blob/master/docs/docker.md
+如果有GPU，建议使用：ghcr.io/ggerganov/llama.cpp:server-cuda
+如果没有gpu，建议使用：ghcr.io/ggerganov/llama.cpp:server
+如果想要拉取默认的基础镜像为最新版本，check下最新的dockerfile文件，确认下是否与自己环境的cuda版本兼容。链接如下：https://github.com/ggerganov/llama.cpp/tree/master/.devops
+如果最新的镜像不能满足需求，可以尝试搜索下历史镜像
+可访问页面进行搜索:https://github.com/ggerganov/llama.cpp/pkgs/container/llama.cpp</p>
+<p>以最新的镜像为例，具体命令如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker pull ghcr.io/ggerganov/llama.cpp:server-cuda --platform linux/amd64 <span class="c1">#如果镜像拉操作系统与最终操作系统不一致，需要加上--platform参数。如果一致，无需添加。</span>
+</span></span><span class="line"><span class="cl">docker save -o llama.cpp.tar ghcr.io/ggerganov/llama.cpp:server-cuda <span class="c1">#如果需要离线导入目标机器，可将镜像保存为tar包</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="自定义镜像">自定义镜像
+</h3><p>历史镜像可能不满足需求，可以尝试自定义镜像。这里以cuda 11.8.0为例。
+查看nvidia/cuda镜像的tag，选择合适的版本。参考地址：https://hub.docker.com/r/nvidia/cuda/tags</p>
+<ol>
+<li>准备llama.cpp镜像</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone https://github.com/ggerganov/llama.cpp
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> llama.cpp
+</span></span><span class="line"><span class="cl">vim .devops/cuda.Dockerfile  <span class="c1"># 修改对应的cuda版本，注意操作系统的版本也要和刚查到的镜像保持一致</span>
+</span></span><span class="line"><span class="cl">docker build -t llama.cpp:server-cuda-11.8 .devops/cuda.Dockerfile
+</span></span><span class="line"><span class="cl"><span class="c1"># 保存为tar包，方便离线导入目标机器</span>
+</span></span><span class="line"><span class="cl">docker save -o llama.cpp-server-cuda-11.8.tar llama.cpp:server-cuda-11.8
+</span></span><span class="line"><span class="cl"><span class="c1"># 也可选择push到自己的镜像仓库</span>
+</span></span><span class="line"><span class="cl">docker push <span class="si">${</span><span class="p"> your hub </span><span class="si">}</span>/llama.cpp:server-cuda-11.8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Dockerfile示例:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Dockerfile" data-lang="Dockerfile"><span class="line"><span class="cl"><span class="k">ARG</span> <span class="nv">UBUNTU_VERSION</span><span class="o">=</span><span class="m">20</span>.04   <span class="c1"># 修改为目标版本 # 如果目标版本为20.04，会出现时区问题和cmake版本过低问题，需要单独调整</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># This needs to generally match the container host&#39;s environment.</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ARG</span> <span class="nv">CUDA_VERSION</span><span class="o">=</span><span class="m">11</span>.5.2  <span class="c1"># 修改为目标版本</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># Target the CUDA build image</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ARG</span> <span class="nv">BASE_CUDA_DEV_CONTAINER</span><span class="o">=</span>nvidia/cuda:<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="si">}</span>-devel-ubuntu<span class="si">${</span><span class="nv">UBUNTU_VERSION</span><span class="si">}</span>  <span class="c1"># 确保dockerhub中有该镜像</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ARG</span> <span class="nv">BASE_CUDA_RUN_CONTAINER</span><span class="o">=</span>nvidia/cuda:<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="si">}</span>-runtime-ubuntu<span class="si">${</span><span class="nv">UBUNTU_VERSION</span><span class="si">}</span>  <span class="c1"># 确保dockerhub中有该镜像</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ARG</span> <span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="s"> ${BASE_CUDA_DEV_CONTAINER} AS build</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># CUDA architecture to build for (defaults to all supported archs)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ARG</span> <span class="nv">CUDA_DOCKER_ARCH</span><span class="o">=</span>default
+</span></span><span class="line"><span class="cl"><span class="c"># 版本为20.04时，需要单独调整时区问题，需要调整部分</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">###########################################</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">#ENV TZ=Etc/UTC</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># RUN apt-get update &amp;&amp; \</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">#     apt-get install -y tzdata wget tar  build-essential  python3 python3-pip git libcurl4-openssl-dev libgomp1 &amp;&amp; \</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">#      wget https://github.com/Kitware/CMake/releases/download/v3.31.5/cmake-3.31.5-linux-x86_64.tar.gz  &amp;&amp; \</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">#      tar -zxvf cmake-3.31.5-linux-x86_64.tar.gz  &amp;&amp; mv cmake-3.31.5-linux-x86_64 /opt/cmake &amp;&amp; \ </span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">#      ln -s  /opt/cmake/bin/cmake  /usr/bin/cmake &amp;&amp; cmake --version </span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">###########################################</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> apt-get update <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    apt-get install -y build-essential cmake python3 python3-pip git libcurl4-openssl-dev libgomp1<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /app</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> . .<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> <span class="k">if</span> <span class="o">[</span> <span class="s2">&#34;</span><span class="si">${</span><span class="nv">CUDA_DOCKER_ARCH</span><span class="si">}</span><span class="s2">&#34;</span> !<span class="o">=</span> <span class="s2">&#34;default&#34;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="nb">export</span> <span class="nv">CMAKE_ARGS</span><span class="o">=</span><span class="s2">&#34;-DCMAKE_CUDA_ARCHITECTURES=</span><span class="si">${</span><span class="nv">CUDA_DOCKER_ARCH</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="k">fi</span> <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    cmake -B build -DGGML_NATIVE<span class="o">=</span>OFF -DGGML_CUDA<span class="o">=</span>ON -DLLAMA_CURL<span class="o">=</span>ON <span class="si">${</span><span class="nv">CMAKE_ARGS</span><span class="si">}</span> -DCMAKE_EXE_LINKER_FLAGS<span class="o">=</span>-Wl,--allow-shlib-undefined . <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    cmake --build build --config Release -j<span class="k">$(</span>nproc<span class="k">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> mkdir -p /app/lib <span class="o">&amp;&amp;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    find build -name <span class="s2">&#34;*.so&#34;</span> -exec cp <span class="o">{}</span> /app/lib <span class="se">\;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> mkdir -p /app/full <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> cp build/bin/* /app/full <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> cp *.py /app/full <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> cp -r gguf-py /app/full <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> cp -r requirements /app/full <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> cp requirements.txt /app/full <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> cp .devops/tools.sh /app/full/tools.sh<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">## Base image</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> ${BASE_CUDA_RUN_CONTAINER} AS base</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> apt-get update <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> apt-get install -y libgomp1 curl<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> apt autoremove -y <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> apt clean -y <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> rm -rf /tmp/* /var/tmp/* <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> find /var/cache/apt/archives /var/lib/apt/lists -not -name lock -type f -delete <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>    <span class="o">&amp;&amp;</span> find /var/cache -type f -delete<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> --from<span class="o">=</span>build /app/lib/ /app<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 此处删除了light full 等不必要的镜像信息，仅留了server信息</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c">### Server, Server only</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> base AS server</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ENV</span> <span class="nv">LLAMA_ARG_HOST</span><span class="o">=</span><span class="m">0</span>.0.0.0<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> --from<span class="o">=</span>build /app/full/llama-server /app<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /app</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">HEALTHCHECK</span> CMD <span class="o">[</span> <span class="s2">&#34;curl&#34;</span>, <span class="s2">&#34;-f&#34;</span>, <span class="s2">&#34;http://localhost:8080/health&#34;</span> <span class="o">]</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">ENTRYPOINT</span> <span class="p">[</span> <span class="s2">&#34;/app/llama-server&#34;</span> <span class="p">]</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>也可选择将llama.cpp仓库fork,修改为目标版本的Dockerfile，然后使用github的工作流去构建镜像。可参考镜像仓库：https://github.com/Williamyzd/appbuilder.git
+可直接使用的tag:https://github.com/Williamyzd/appbuilder/pkgs/container/appbuilder%2Fllama.cpp</p>
+<h2 id="准备模型">准备模型
+</h2><h2 id="docker-compose撰写">docker-compose撰写
+</h2><h2 id="k8s-yaml撰写">k8s-yaml撰写
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">qwen2-5-14b-gpu</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">llms</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">qwen2-5-14b-gpu</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w">  </span><span class="c"># 副本数量</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">qwen2-5-14b-gpu</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">qwen2-5-14b-gpu</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">affinity</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">nodeAffinity</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">requiredDuringSchedulingIgnoredDuringExecution</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">nodeSelectorTerms</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span>- <span class="nt">matchExpressions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">kubernetes.io/cluster-role</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">In</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="l">slave</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span>- <span class="l">master-compute</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c">#   - key: kubernetes.io/gpu-type-name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c">#     operator: In</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c">#     values:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c">#     - Tesla-P4  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">qwen2-5-14b-gpu-gpu</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="m">10.233.0.100</span><span class="p">:</span><span class="m">5000</span><span class="l">/llama_cpp_gpu_12_2:cuda12.2_img-csbhtgdrp9ts131y</span><span class="w"> </span><span class="c"># 使用的镜像</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w"> </span><span class="c"># 镜像拉取策略</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c">#command: [&#34;nvidia-smi&#34;,&#34;&amp;&amp;&#34;,&#34;tail&#34;, &#34;-f&#34;,&#34;/dev/null&#34;]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_MODEL</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;/models/qwen2.5-14b-instruct-q5_k_m.gguf&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_PORT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8000&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_UBATCH</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;4096&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_HOST  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;0.0.0.0&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_N_PARALLEL</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;2&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_N_PREDICT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;4096&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_CTX_SIZE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;12000&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">LLAMA_ARG_N_GPU_LAYERS</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;10&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># # vgpu 资源限制</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># - name: USE_GPU</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c">#   value: &#34;1&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c"># - name: GPU_NUM</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c">#   value: &#34;100&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">requests</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1Gi&#34;</span><span class="w">  </span><span class="c"># 请求的内存大小</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">     </span><span class="c"># 请求的 CPU 大小（以毫核为单位）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;64Gi&#34;</span><span class="w"> </span><span class="c"># 限制的内存大小</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">securityContext</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">privileged</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">runAsGroup</span><span class="p">:</span><span class="w"> </span><span class="m">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">runAsUser</span><span class="p">:</span><span class="w"> </span><span class="m">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">8000</span><span class="w"> </span><span class="c"># 容器暴露的端口</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/dev/shm</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cache-volume</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/models</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c">#   subPath: v-wa9c73y3ge0wrvmm/org/william/qwen</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">llm-models</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cache-volume</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">emptyDir</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">medium</span><span class="p">:</span><span class="w"> </span><span class="l">Memory</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">sizeLimit</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;4Gi&#34;</span><span class="w">     
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#   - name: gluster-llms</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#     persistentVolumeClaim:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">#       claimName: gluster-llms </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c">### 此处根据实际填写</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">hostPath</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/models</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">Directory</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">llm-models</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">qwen2-5-14b-gpu</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">llms</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w">  </span><span class="l">qwen2-5-14b-gpu </span><span class="w"> </span><span class="c"># 确保这与 Deployment 中 Pod 的标签相匹配</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8000</span><span class="w">  </span><span class="c"># Service 监听的端口</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">8000</span><span class="w">  </span><span class="c"># Pod 内应用程序监听的端口</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="m">8512</span><span class="w">  </span><span class="c"># Node 上开放的端口</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort </span><span class="w"> </span><span class="c"># Service 类型设置为 NodePort</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>此处使用hostpath挂载模型，可根据实际环境选择更适合的存储方式。</li>
+<li>注意对hostpath挂载的位置做调整</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+	const mainArticleElement = document.querySelector(".main-article");
+        renderMathInElement(mainArticleElement, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2025 流年
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
